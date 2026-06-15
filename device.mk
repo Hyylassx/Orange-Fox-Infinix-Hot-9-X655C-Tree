@@ -1,17 +1,27 @@
+# --- PART 1: ROOT CONFIGURATION ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/prebuilt/dtb.img:dtb.img \
     $(DEVICE_PATH)/recovery/root/ueventd.mt6765.rc:recovery/root/ueventd.mt6765.rc \
     $(DEVICE_PATH)/recovery/root/init.recovery.usb.rc:recovery/root/init.recovery.usb.rc \
-    $(DEVICE_PATH)/recovery/root/system/etc/twrp.flags:recovery/root/system/etc/twrp.flags \
-    $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab:recovery/root/system/etc/recovery.fstab \
     $(DEVICE_PATH)/recovery/root/init.recovery.mt6765.rc:recovery/root/init.recovery.mt6765.rc \
-    $(DEVICE_PATH)/recovery/root/init.recovery.microtrust.rc:recovery/root/init.recovery.microtrust.rc \
+    $(DEVICE_PATH)/recovery/root/init.recovery.microtrust.rc:recovery/root/init.recovery.microtrust.rc
+
+# --- PART 2: SYSTEM ETC ---
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/system/etc/twrp.flags:recovery/root/system/etc/twrp.flags \
+    $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab:recovery/root/system/etc/recovery.fstab
+
+# --- PART 3: VENDOR VINTF ---
+PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/etc/vintf/manifest.xml:recovery/root/vendor/etc/vintf/manifest.xml \
-    $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_fw.bin:recovery/root/vendor/firmware/novatek_ts_fw.bin \
-    $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_mp.bin:recovery/root/vendor/firmware/novatek_ts_mp.bin \
     $(DEVICE_PATH)/recovery/root/vendor/etc/vintf/compatibility_matrix.xml:recovery/root/vendor/etc/vintf/compatibility_matrix.xml
 
-# RECOVERY SYSTEM LIBRARIES 32 Bit
+# --- PART 4: VENDOR FIRMWARE ---
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_fw.bin:recovery/root/vendor/firmware/novatek_ts_fw.bin \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_mp.bin:recovery/root/vendor/firmware/novatek_ts_mp.bin
+
+# --- PART 5: SYSTEM LIBRARIES 32-BIT ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib/libion.so:root/system/lib/libion.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libhwbinder.so:root/system/lib/libhwbinder.so \
@@ -26,8 +36,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.keymaster@4.0.so:root/system/lib/android.hardware.keymaster@4.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.gatekeeper@1.0.so:root/system/lib/android.hardware.gatekeeper@1.0.so
 
-
-# RECOVERY SYSTEM LIBRARIES 64 Bit
+# --- PART 6: SYSTEM LIBRARIES 64-BIT ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib64/libion.so:root/system/lib64/libion.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libhwbinder.so:root/system/lib64/libhwbinder.so \
@@ -43,7 +52,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.keymaster@4.0.so:root/system/lib64/android.hardware.keymaster@4.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.gatekeeper@1.0.so:root/system/lib64/android.hardware.gatekeeper@1.0.so
 
-# VENDOR TEEI DEAMONS & SERVICES (Gatekeeper / Keymaster)
+# --- PART 7: VENDOR BINARIES ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/bin/teei_daemon:recovery/root/vendor/bin/teei_daemon \
     $(DEVICE_PATH)/recovery/root/vendor/bin/bp_kmsetkey_ca:recovery/root/vendor/bin/bp_kmsetkey_ca \
@@ -52,9 +61,9 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod:recovery/root/vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-service:recovery/root/vendor/bin/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-service
 
-# VENDOR SO LIBRARIES (32-bit & 64-bit)
+# --- PART 8: VENDOR LIBRARIES 32-BIT ---
 PRODUCT_COPY_FILES += \
-$(DEVICE_PATH)/recovery/root/vendor/lib/libmtee.so:recovery/root/vendor/lib/libmtee.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib/libmtee.so:recovery/root/vendor/lib/libmtee.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/libion_mtk.so:recovery/root/vendor/lib/libion_mtk.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/libimsg_log.so:recovery/root/vendor/lib/libimsg_log.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/libion_ulit.so:recovery/root/vendor/lib/libion_ulit.so \
@@ -75,6 +84,7 @@ $(DEVICE_PATH)/recovery/root/vendor/lib/libmtee.so:recovery/root/vendor/lib/libm
     $(DEVICE_PATH)/recovery/root/vendor/lib/vendor.mediatek.hardware.keymaster_attestation@1.1.so:recovery/root/vendor/lib/vendor.mediatek.hardware.keymaster_attestation@1.1.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so:recovery/root/vendor/lib/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so
 
+# --- PART 9: VENDOR LIBRARIES 64-BIT ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libmtee.so:recovery/root/vendor/lib64/libmtee.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libion_mtk.so:recovery/root/vendor/lib64/libion_mtk.so \
@@ -99,7 +109,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.1.so:recovery/root/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.1.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so:recovery/root/vendor/lib64/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so
 
-# TRUSTED APPLICATIONS (TA Files)
+# --- PART 10: TRUSTED APPLICATIONS ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/thh/ta/7778c03fc30c4dd0a319ea29643d4d4b.ta:recovery/root/vendor/thh/ta/7778c03fc30c4dd0a319ea29643d4d4b.ta \
     $(DEVICE_PATH)/recovery/root/vendor/thh/ta/7778c03fc30c4dd0a319ea29643d4dc0.ta:recovery/root/vendor/thh/ta/7778c03fc30c4dd0a319ea29643d4dc0.ta \
@@ -108,7 +118,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/thh/ta/c1882f2d885e4e13a8c8e2622461b2fa.ta:recovery/root/vendor/thh/ta/c1882f2d885e4e13a8c8e2622461b2fa.ta \
     $(DEVICE_PATH)/recovery/root/vendor/thh/ta/d91f322ad5a441d5955110eda3272fc0.ta:recovery/root/vendor/thh/ta/d91f322ad5a441d5955110eda3272fc0.ta
 
-# VOLD & CRYPTO PROPERTIES
+# --- PART 11: SYSTEM PROPERTIES ---
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.twrp.boot=1
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.crypto.state=encrypted
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.crypto.type=file
