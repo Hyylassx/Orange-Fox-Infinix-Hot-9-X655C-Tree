@@ -27,7 +27,9 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib/libhwbinder.so:root/system/lib/libhwbinder.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libhidlmemory.so:root/system/lib/libhidlmemory.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libgatekeeper.so:root/system/lib/libgatekeeper.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_aidl.so:root/system/lib/libkeystore_aidl.so \
+    $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_aidl.so:root/system/lib/libkeystore_aidl.so
+
+PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hidl.memory@1.0.so:root/system/lib/android.hidl.memory@1.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.boot@1.0.so:root/system/lib/android.hardware.boot@1.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hidl.allocator@1.0.so:root/system/lib/android.hidl.allocator@1.0.so \
@@ -43,7 +45,9 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib64/libhidlmemory.so:root/system/lib64/libhidlmemory.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libgatekeeper.so:root/system/lib64/libgatekeeper.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libfscrypt.so:root/system/lib64/libfscrypt.so \
-    $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_aidl.so:root/system/lib64/libkeystore_aidl.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_aidl.so:root/system/lib64/libkeystore_aidl.so
+
+PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hidl.memory@1.0.so:root/system/lib64/android.hidl.memory@1.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.boot@1.0.so:root/system/lib64/android.hardware.boot@1.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hidl.allocator@1.0.so:root/system/lib64/android.hidl.allocator@1.0.so \
