@@ -17,6 +17,12 @@ PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
 PRODUCT_PACKAGES += \
     vold \
+    service \
+    keystore \
     keystore2 \
+    vndservice \
+    vndservicemanager \
+    servicemanager \
+    hwservicemanager \
     gatekeeperd \
     wait_for_keymaster
