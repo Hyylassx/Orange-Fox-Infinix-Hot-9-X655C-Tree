@@ -10,6 +10,11 @@ on boot
     setprop vendor.usb.acm_port1 ""
     setprop vendor.usb.acm_enable 0
 
+    # Clean filename translation link for OrangeFox UI Flashlight
+    symlink /sys/class/torch/torch/torch_level /sys/class/torch/torch/brightness
+    chmod 0666 /sys/class/torch/torch/torch_level
+    chmod 0666 /sys/class/torch/torch/brightness
+
 on property:ro.boot.usbcontroller=*
     setprop sys.usb.controller ${ro.boot.usbcontroller}
 
@@ -17,14 +22,12 @@ on fs
     mkdir /config
     mkdir /dev/usb-ffs 0770 shell shell
     mkdir /dev/usb-ffs/adb 0770 shell shell
-    mkdir /dev/usb-ffs/fastboot 0770 shell shell
     mount configfs none /config
     mkdir /config/usb_gadget/g1 0770 shell shell
     mkdir /config/usb_gadget/g1/strings/0x409 0770 shell shell
     write /config/usb_gadget/g1/bcdDevice 0x0223
     write /config/usb_gadget/g1/bcdUSB 0x0200
     write /config/usb_gadget/g1/os_desc/use 1
-    # Use MediaTek Vendor ID here instead of Xiaomi
     write /config/usb_gadget/g1/idVendor 0x0E8D
     write /config/usb_gadget/g1/strings/0x409/serialnumber ${ro.serialno}
     write /config/usb_gadget/g1/strings/0x409/manufacturer ${ro.product.manufacturer}
@@ -32,7 +35,6 @@ on fs
 
     mkdir /config/usb_gadget/g1/functions/mass_storage.usb0
     mkdir /config/usb_gadget/g1/functions/ffs.adb
-    mkdir /config/usb_gadget/g1/functions/ffs.fastboot
     mkdir /config/usb_gadget/g1/functions/mtp.gs0
     write /config/usb_gadget/g1/functions/mtp.gs0/os_desc/interface.MTP/compatible_id "MTP"
     
@@ -44,7 +46,6 @@ on fs
     symlink /config/usb_gadget/g1/configs/b.1 /config/usb_gadget/g1/os_desc/b.1
     
     mount functionfs adb /dev/usb-ffs/adb uid=2000,gid=2000
-    mount functionfs fastboot /dev/usb-ffs/fastboot rmode=0770,fmode=0660,uid=1000,gid=1000
 
 # CLEANUP TRIGGER (Tears down old links before switching modes)
 on property:sys.usb.config=none && property:sys.usb.configfs=1
@@ -71,12 +72,18 @@ on property:sys.usb.ffs.ready=1 && property:sys.usb.config=adb && property:sys.u
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
 
-# FASTBOOTD MODE (Crucial missing piece for Windows Detection & GSI Flashing)
-on property:sys.usb.ffs.fastboot.ready=1 && property:sys.usb.config=fastboot && property:sys.usb.configfs=1
+# FASTBOOTD MODE (MediaTek Multiplexed Realignment Fix)
+on property:sys.usb.config=fastboot && property:sys.usb.configfs=1
     stop adbd
+    start fastbootd
+    write /config/usb_gadget/g1/UDC "none"
     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "fastboot"
+    write /config/usb_gadget/g1/idVendor 0x0E8D
     write /config/usb_gadget/g1/idProduct 0x201C
-    symlink /config/usb_gadget/g1/functions/ffs.fastboot /config/usb_gadget/g1/configs/b.1/f1
+    
+    # Multiplex fastboot protocols onto the existing ADB channel node template
+    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
+    
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
 
