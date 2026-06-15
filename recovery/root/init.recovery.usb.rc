@@ -10,11 +10,6 @@ on boot
     setprop vendor.usb.acm_port1 ""
     setprop vendor.usb.acm_enable 0
 
-    # Clean filename translation link for OrangeFox UI Flashlight
-    symlink /sys/class/torch/torch/torch_level /sys/class/torch/torch/brightness
-    chmod 0666 /sys/class/torch/torch/torch_level
-    chmod 0666 /sys/class/torch/torch/brightness
-
 on property:ro.boot.usbcontroller=*
     setprop sys.usb.controller ${ro.boot.usbcontroller}
 
