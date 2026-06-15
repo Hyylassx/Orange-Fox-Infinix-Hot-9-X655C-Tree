@@ -60,15 +60,15 @@ $(DEVICE_PATH)/recovery/root/vendor/lib/libmtee.so:recovery/root/vendor/lib/libm
     $(DEVICE_PATH)/recovery/root/vendor/lib/libion_ulit.so:recovery/root/vendor/lib/libion_ulit.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/libTEECommon.so:recovery/root/vendor/lib/libTEECommon.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/libcrypto-mdapp.so:recovery/root/vendor/lib/libcrypto-mdapp.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libkeymaster_messages.so:root/vendor/lib/libkeymaster_messages.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libkeymaster_portable.so:root/vendor/lib/libkeymaster_portable.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libsoftkeymasterdevice.so:root/vendor/lib/libsoftkeymasterdevice.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib/libkeymaster_messages_bp.so:root/vendor/lib/libkeymaster_messages_bp.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib/libkeymaster_portable_bp.so:root/vendor/lib/libkeymaster_portable_bp.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib/libsoftkeymasterdevice_bp.so:root/vendor/lib/libsoftkeymasterdevice_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/kmsetkey.mt6765.so:recovery/root/vendor/lib/hw/kmsetkey.mt6765.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/kmsetkey.default.so:recovery/root/vendor/lib/hw/kmsetkey.default.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/gatekeeper.mt6765.so:recovery/root/vendor/lib/hw/gatekeeper.mt6765.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/libkeymaster4support.so:recovery/root/vendor/lib/libkeymaster4support.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/libSoftGatekeeper.so:recovery/root/vendor/lib/hw/libSoftGatekeeper.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libpuresoftkeymasterdevice.so:recovery/root/vendor/lib/libpuresoftkeymasterdevice.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib/libpuresoftkeymasterdevice_bp.so:recovery/root/vendor/lib/libpuresoftkeymasterdevice_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/vendor.microtrust.hardware.capi@2.0.so:recovery/root/vendor/lib/vendor.microtrust.hardware.capi@2.0.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/android.hardware.gatekeeper@1.0-impl.so:recovery/root/vendor/lib/hw/android.hardware.gatekeeper@1.0-impl.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/vendor.mediatek.hardware.keymaster_attestation@1.0.so:recovery/root/vendor/lib/vendor.mediatek.hardware.keymaster_attestation@1.0.so \
@@ -84,15 +84,15 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster4.so:recovery/root/vendor/lib64/libkeymaster4.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libTEECommon.so:recovery/root/vendor/lib64/libTEECommon.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libcrypto-mdapp.so:recovery/root/vendor/lib64/libcrypto-mdapp.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster_messages.so:root/vendor/lib64/libkeymaster_messages.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster_portable.so:root/vendor/lib64/libkeymaster_portable.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib64/libsoftkeymasterdevice.so:root/vendor/lib64/libsoftkeymasterdevice.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster_messages_bp.so:root/vendor/lib64/libkeymaster_messages_bp.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster_portable_bp.so:root/vendor/lib64/libkeymaster_portable_bp.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/libsoftkeymasterdevice_bp.so:root/vendor/lib64/libsoftkeymasterdevice_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/kmsetkey.mt6765.so:recovery/root/vendor/lib64/hw/kmsetkey.mt6765.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/kmsetkey.default.so:recovery/root/vendor/lib64/hw/kmsetkey.default.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/libSoftGatekeeper.so:recovery/root/vendor/lib64/hw/libSoftGatekeeper.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster4support.so:recovery/root/vendor/lib64/libkeymaster4support.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/gatekeeper.mt6765.so:recovery/root/vendor/lib64/hw/gatekeeper.mt6765.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib64/libpuresoftkeymasterdevice.so:recovery/root/vendor/lib64/libpuresoftkeymasterdevice.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/libpuresoftkeymasterdevice_bp.so:recovery/root/vendor/lib64/libpuresoftkeymasterdevice_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/vendor.microtrust.hardware.capi@2.0.so:recovery/root/vendor/lib64/vendor.microtrust.hardware.capi@2.0.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/android.hardware.gatekeeper@1.0-impl.so:recovery/root/vendor/lib64/hw/android.hardware.gatekeeper@1.0-impl.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.0.so:recovery/root/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.0.so \
