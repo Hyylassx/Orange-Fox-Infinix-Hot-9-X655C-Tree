@@ -123,6 +123,8 @@ OF_MAX_BRIGHTNESS := 225
 OF_INPUT_BLACKLIST := "hct_battery"
 
 # Twrp Specific
+TW_MAX_BRIGHTNESS := 1
+TW_CUSTOM_LED_PATH := "/sys/class/torch/torch"
 TW_NO_SCREEN_TIMEOUT := true
 TW_DISABLE_KEYSTORE := false
 TW_MAX_BRIGHTNESS := 225
