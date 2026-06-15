@@ -97,7 +97,6 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/kmsetkey.default.so:recovery/root/vendor/lib/hw/kmsetkey.default.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/libpuresoftkeymasterdevice_bp.so:recovery/root/vendor/lib/libpuresoftkeymasterdevice_bp.so
 
-
 # --- PART 9: VENDOR LIBRARIES 64-BIT ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libmtee.so:recovery/root/vendor/lib64/libmtee.so \
@@ -106,6 +105,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libimsg_log.so:recovery/root/vendor/lib64/libimsg_log.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libTEECommon.so:recovery/root/vendor/lib64/libTEECommon.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libcrypto-mdapp.so:recovery/root/vendor/lib64/libcrypto-mdapp.so \
+
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/libSoftGatekeeper.so:recovery/root/vendor/lib64/hw/libSoftGatekeeper.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/gatekeeper.mt6765.so:recovery/root/vendor/lib64/hw/gatekeeper.mt6765.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/vendor.microtrust.hardware.capi@2.0.so:recovery/root/vendor/lib64/vendor.microtrust.hardware.capi@2.0.so \
@@ -121,6 +121,8 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster_portable_bp.so:root/vendor/lib64/libkeymaster_portable_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster4support.so:recovery/root/vendor/lib64/libkeymaster4support.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libpuresoftkeymasterdevice_bp.so:recovery/root/vendor/lib64/libpuresoftkeymasterdevice_bp.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeystore-wifi-hidl.so:recovery/root/vendor/lib64/libkeystore-wifi-hidl.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeystore-engine-wifi-hidl.so:recovery/root/vendor/lib64/libkeystore-engine-wifi-hidl.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libsoftkeymasterdevice_bp.so:root/vendor/lib64/libsoftkeymasterdevice_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/kmsetkey.mt6765.so:recovery/root/vendor/lib64/hw/kmsetkey.mt6765.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/kmsetkey.default.so:recovery/root/vendor/lib64/hw/kmsetkey.default.so
