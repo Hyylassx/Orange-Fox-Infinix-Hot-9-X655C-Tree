@@ -4,7 +4,8 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/ueventd.mt6765.rc:recovery/root/ueventd.mt6765.rc \
     $(DEVICE_PATH)/recovery/root/init.recovery.usb.rc:recovery/root/init.recovery.usb.rc \
     $(DEVICE_PATH)/recovery/root/init.recovery.mt6765.rc:recovery/root/init.recovery.mt6765.rc \
-    $(DEVICE_PATH)/recovery/root/init.recovery.microtrust.rc:recovery/root/init.recovery.microtrust.rc
+    $(DEVICE_PATH)/recovery/root/init.recovery.microtrust.rc:recovery/root/init.recovery.microtrust.rc \ 
+    $(DEVICE_PATH)/foxstart.sh:root/sbin/foxstart.sh
 
 # --- PART 2: SYSTEM ETC ---
 PRODUCT_COPY_FILES += \
