@@ -20,6 +20,7 @@ PRODUCT_PACKAGES += \
     vold \
     libvold \
     libcrypto \
+    libfscrypt \
     libgatekeeper \
     libkeymaster4support \
     keystore2 \
