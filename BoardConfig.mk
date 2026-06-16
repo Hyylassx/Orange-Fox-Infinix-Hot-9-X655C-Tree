@@ -142,12 +142,16 @@ TW_LOAD_VENDOR_BOOT_MODULES := true
 TW_CUSTOM_SETTINGS_PATH := /cache/recovery/fox
 
 TARGET_RECOVERY_DEVICE_MODULES += \
+    vold \
+    libvold \
     keystore \
     servicemanager \
     hwservicemanager \
     vndservicemanager \
     libion \
-    libfscrypt
+    libfscrypt \
+    gatekeeperd \
+    wait_for_keymaster
 
 # CRITICAL FIX: Remove wrong key path, let OrangeFox auto-detect
 # TW_FORCE_KEY_DIRECTORY := "/data/unencrypted/key"  # REMOVED - wrong for MTK FBE
