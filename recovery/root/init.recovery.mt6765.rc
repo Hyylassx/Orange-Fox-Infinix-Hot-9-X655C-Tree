@@ -37,10 +37,8 @@ on init
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
     
-    # 1. Mount the logical vendor block first
-    mount ext4 /dev/block/mapper/vendor /vendor ro
-
-    # 2. Mount metadata with correct SELinux context
+    # 1. Mount raw metadata partition
+    wait /dev/block/platform/bootdevice/by-name/md_udc
     mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata noatime,nosuid,nodev,discard
     restorecon_recursive /metadata
 
@@ -48,18 +46,26 @@ on fs
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
 
-    # 3. Mount raw MediaTek storage partitions
+    # 2. Mount raw MediaTek storage partitions
+    wait /dev/block/platform/bootdevice/by-name/nvcfg
     mount ext4 /dev/block/platform/bootdevice/by-name/nvcfg /mnt/vendor/nvcfg rw wait
+    
+    wait /dev/block/platform/bootdevice/by-name/nvdata
     mount ext4 /dev/block/platform/bootdevice/by-name/nvdata /mnt/vendor/nvdata rw wait
 
-    # 4. Initialize driver permissions for Microtrust Beanpod
+# NEW SECTION: Mount logical blocks ONLY after device mapper maps them
+on late-fs
+    wait /dev/block/mapper/vendor
+    mount ext4 /dev/block/mapper/vendor /vendor ro barrier=1
+
+    # Initialize driver permissions for Microtrust Beanpod
     chmod 0666 /dev/teei_client
     chmod 0666 /dev/teei_config
     chmod 0660 /dev/tz_mem
     chown system system /dev/teei_client
     chown system system /dev/tz_mem
 
-    # 5. Start core services before TEE
+    # Start core infrastructure now that vendor files are exposed
     start servicemanager
     start hwservicemanager
     start hidl_memory
