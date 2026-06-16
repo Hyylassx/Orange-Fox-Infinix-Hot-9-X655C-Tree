@@ -19,7 +19,6 @@ PRODUCT_USE_DYNAMIC_PARTITIONS := true
 PRODUCT_PACKAGES += \
     vold \
     libvold \
-    libfscrypt \
     libcrypto \
     libgatekeeper \
     libkeymaster4support \
