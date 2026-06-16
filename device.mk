@@ -11,18 +11,13 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/etc/twrp.flags:recovery/root/system/etc/twrp.flags \
     $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab:recovery/root/system/etc/recovery.fstab
 
-# --- PART 3: VENDOR VINTF ---
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/vendor/etc/vintf/manifest.xml:recovery/root/vendor/etc/vintf/manifest.xml \
-    $(DEVICE_PATH)/recovery/root/vendor/etc/vintf/compatibility_matrix.xml:recovery/root/vendor/etc/vintf/compatibility_matrix.xml
-
-# --- PART 4: VENDOR FIRMWARE ---
+# --- PART 3: VENDOR FIRMWARE ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_fw.bin:recovery/root/vendor/firmware/novatek_ts_fw.bin \
     $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_mp.bin:recovery/root/vendor/firmware/novatek_ts_mp.bin
 
 
-# --- PART 5: SYSTEM PROPERTIES ---
+# --- PART 4: SYSTEM PROPERTIES ---
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.twrp.boot=1
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.crypto.state=encrypted
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.crypto.type=file
