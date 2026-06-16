@@ -26,14 +26,6 @@ service teei_daemon /vendor/bin/teei_daemon \
     disabled
     seclabel u:r:recovery:s0
 
-service beanpod_check_keybox_service /vendor/bin/bp_kmsetkey_ca -c
-    class late_start
-    user system
-    group system
-    oneshot
-    disabled
-    seclabel u:r:recovery:s0
-
 on fs
     # TEE device nodes - must be set before teei_daemon starts
     chmod 0660 /dev/teei_client
