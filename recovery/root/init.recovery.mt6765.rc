@@ -216,9 +216,7 @@ on post-fs-data-tee
     chown system system /data/vendor/key_provisioning
     restorecon_recursive /data/vendor/thh
 
-# ============================================
 # PREVENT BOOTLOOP & FASTBOOT REBOOTS
-# ============================================
 on property:sys.powerctl=reboot
     exec_background /system/bin/sh -c "echo 'REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
     setprop sys.powerctl ""
@@ -231,8 +229,9 @@ on property:sys.powerctl=reboot,recovery
     exec_background /system/bin/sh -c "echo 'RECOVERY REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
     setprop sys.powerctl ""
 
-# CORE SERVICES
+
 # NOTE: Removed 'critical' keyword so crashes don't cascade into a fastboot reboot!
+# CORE SERVICES PATH AND PRIVILEGE FIXES
 
 service servicemanager /system/bin/servicemanager
     class core
@@ -243,8 +242,8 @@ service servicemanager /system/bin/servicemanager
 
 service hwservicemanager /system/bin/hwservicemanager
     class core
-    user system
-    group system readproc
+    user root
+    group root readproc
     onrestart setprop hwservicemanager.ready false
     writepid /dev/cpuset/system-background/tasks
     shutdown critical
@@ -273,14 +272,14 @@ service vold /system/bin/vold \
 
 service gatekeeperd /system/bin/gatekeeperd /data/misc/gatekeeper
     class late_start
-    user system
+    user root
     writepid /dev/cpuset/system-background/tasks
     disabled
     seclabel u:r:recovery:s0
 
 service keystore /system/bin/keystore /data/misc/keystore
     class main
-    user keystore
+    user root
     group keystore drmrpc readproc log
     writepid /dev/cpuset/foreground/tasks
     disabled
@@ -296,40 +295,50 @@ service wait_for_keymaster /system/bin/wait_for_keymaster
     oneshot
     seclabel u:r:recovery:s0
 
-# HAL SERVICES
+# ============================================
+# HAL SERVICES (Correct Paths & Root Access Rules)
+# ============================================
 
 service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod
     class early_hal
-    user system
-    group system drmrpc
+    user root
+    group root drmrpc
     disabled
     seclabel u:r:recovery:s0
 
 service teei_capi_2_0 /vendor/bin/hw/vendor.microtrust.hardware.capi@2.0-service
     class early_hal
-    user system
-    group system
+    user root
+    group root
     oneshot
     disabled
     seclabel u:r:recovery:s0
 
 service vendor.gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
     class early_hal
-    user system
-    group system
+    user root
+    group root
     disabled
     seclabel u:r:recovery:s0
 
 service keymaster_attestation-1-1 /vendor/bin/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-service
     class early_hal
-    user system
-    group system
+    user root
+    group root
     disabled
     seclabel u:r:recovery:s0
 
 service hidl_memory /system/bin/hw/android.hidl.allocator@1.0-service
     class hal
-    user system
-    group system
+    user root
+    group root
     disabled
+    seclabel u:r:recovery:s0
+
+service beanpod_check_keybox_service /vendor/bin/bp_kmsetkey_ca
+    class early_hal
+    user root
+    group root
+    disabled
+    oneshot
     seclabel u:r:recovery:s0
