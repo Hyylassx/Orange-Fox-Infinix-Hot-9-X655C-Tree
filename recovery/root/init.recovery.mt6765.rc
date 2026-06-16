@@ -32,7 +32,9 @@ on init
     
     setprop sys.init_fatal_vold.reboot 0
     
-    export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin
+    # ADDED /system_root/system/lib64/vndk-29 to the front of the path!
+    # This forces Beanpod to use the correct Android 10 libraries from the stock system.
+    export LD_LIBRARY_PATH /system_root/system/lib64/vndk-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
@@ -55,6 +57,11 @@ on fs
 
 # NEW SECTION: Mount logical blocks ONLY after device mapper maps them
 on late-fs
+    # ADDED: Mount stock system partition to /system_root so VNDK-29 libraries are accessible
+    wait /dev/block/mapper/system
+    mkdir /system_root
+    mount ext4 /dev/block/mapper/system /system_root ro barrier=1
+
     wait /dev/block/mapper/vendor
     mount ext4 /dev/block/mapper/vendor /vendor ro barrier=1
 
