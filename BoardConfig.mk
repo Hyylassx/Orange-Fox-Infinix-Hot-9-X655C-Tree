@@ -30,11 +30,9 @@ TARGET_USERIMAGES_USE_F2FS := true
 TARGET_SCREEN_DENSITY := 320
 TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
-DEVICE_MATRIX_FILE := $(DEVICE_PATH)/recovery/root/vendor/etc/vintf/compatibility_matrix.xml
-DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/recovery/root/vendor/etc/vintf/manifest.xml
 
 # Kernel
-BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive androidboot.boot_devices=bootdevice,11230000.mmc androidboot.hardware=mt6765 androidboot.logical_partitions=1
+BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive bootdevice=bootdevice androidboot.hardware=mt6765 androidboot.logical_partitions=1
 PRODUCT_BOOT_DEVICE := 11230000.mmc
 PRODUCT_COMPRESSED_RAMDISK := gzip
 BOARD_BOOTIMG_HEADER_VERSION := 2
@@ -138,7 +136,6 @@ TW_EXCLUDE_TWRPAPP := true
 TW_DEFAULT_LANGUAGE := en
 TW_EXTRA_LANGUAGES := false
 TW_THEME := portrait_hdpi
-TW_CRYPTO_SYSTEM_VOLD := true
 TW_USE_FSCRYPT_POLICY := 1
 TW_NO_KEYSTORE2 := true
 TW_LOAD_VENDOR_BOOT_MODULES := true
@@ -146,10 +143,11 @@ TW_CUSTOM_SETTINGS_PATH := /cache/recovery/fox
 
 TARGET_RECOVERY_DEVICE_MODULES += \
     keystore \
-    keystore2 \
     servicemanager \
     hwservicemanager \
-    vndservicemanager
+    vndservicemanager \
+    libion \
+    libfscrypt
 
 # CRITICAL FIX: Remove wrong key path, let OrangeFox auto-detect
 # TW_FORCE_KEY_DIRECTORY := "/data/unencrypted/key"  # REMOVED - wrong for MTK FBE
