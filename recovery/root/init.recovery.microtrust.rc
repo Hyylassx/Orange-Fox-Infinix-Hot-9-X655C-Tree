@@ -55,7 +55,7 @@ on post-fs
     exec_background /system/bin/sh -c "if [ -d /vendor/persist ]; then mkdir -p /vendor/persist/rpmb; chmod 0771 /vendor/persist/rpmb; chown system system /vendor/persist/rpmb; fi"
     
     setprop vendor.microtrust.tee.ready true
-    log " TEE READY - Crypto operations available"
+    write /dev/kmsg "--- TEE READY - Crypto operations available ---"
 
 on property:vold.decrypt=trigger_restart_framework
     mkdir /data/misc 01771 system misc
