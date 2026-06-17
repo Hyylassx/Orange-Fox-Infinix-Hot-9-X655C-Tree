@@ -41,7 +41,7 @@ on post-fs
     symlink /dev/block/sdb /dev/block/mmcblk0boot1
     symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
-    wait /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod 25000
+    wait /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod 30000
     
     # Now that /vendor is confirmed mounted, start the TEE and HALs
     class_start early_hal
