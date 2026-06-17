@@ -64,9 +64,8 @@ on post-fs-data
 #  TEE / KEYMASTER / VOLD TRIGGER CHAIN
 
 on property:init.svc.teei_daemon=running
+    # Native 2-second timeout built into wait_for_prop
     wait_for_prop vendor.microtrust.tee.ready true
-    timeout 30
-        logw "TEE not ready after 30s, continuing anyway"
     start beanpod_check_keybox_service
     start vendor.keymaster-4-0-beanpod
     start teei_capi_2_0
@@ -76,13 +75,10 @@ on property:init.svc.teei_daemon=running
 on property:init.svc.vendor.keymaster-4-0-beanpod=running
     wait_for_prop init.svc.vendor.keymaster-4-0-beanpod running
     wait_for_prop vendor.microtrust.tee.ready true
-    timeout 30
-        logw "Keymaster not ready after 30s"
     setprop vold.post_fs_data_done 1
     start vold
 
 on property:init.svc.vold=running
-    sleep 3
     start keystore
     start gatekeeperd
     wait_for_prop init.svc.keystore running
