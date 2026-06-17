@@ -28,9 +28,8 @@ on init
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-    wait /dev/block/platform/bootdevice/by-name/vendor
-    mount ext4 /dev/block/mapper/vendor /vendor ro barrier=1
-    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata noatime,nosuid,nodev,discard
+    wait /dev/block/mapper/vendor
+    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev,discard
     restorecon_recursive /metadata
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
@@ -45,11 +44,6 @@ on post-fs
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
     chmod 0755 /sbin/foxstart.sh
 
-on late-fs
-    wait_for_prop hwservicemanager.ready true
-    class_start early_hal
-    start teei_daemon
-
 on boot
     chmod 0666 /dev/input/event0
     chmod 0666 /dev/input/event1
@@ -60,6 +54,18 @@ on boot
 
 on post-fs-data
     start logd
+    # ... (keep your existing symlinks and chmod commands here) ...
+    chmod 0755 /sbin/foxstart.sh
+
+    # ==========================================
+    # CRITICAL: Wait for Recovery to finish mounting /vendor
+    # ==========================================
+    # This waits up to 10 seconds for the actual Keymaster binary to appear
+    wait /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod 10
+
+    # Now that /vendor is confirmed mounted, start the TEE and HALs
+    class_start early_hal
+    start teei_daemon
 
 #  TEE / KEYMASTER / VOLD TRIGGER CHAIN
 
@@ -220,9 +226,7 @@ service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4
     class early_hal
     user root
     group root
-    drmrpc
     disabled
-    seclabel u:r:recovery:s0
 
 service teei_capi_2_0 /vendor/bin/hw/vendor.microtrust.hardware.capi@2.0-service
     class early_hal
