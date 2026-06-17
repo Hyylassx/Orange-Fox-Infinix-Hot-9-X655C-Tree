@@ -31,7 +31,8 @@ on post-fs
     wait_for_prop hwservicemanager.ready true
     start teei_daemon
     
-    sleep 2
+    # Use wait_for_prop instead of sleep
+    wait_for_prop init.svc.teei_daemon running
     
     start beanpod_check_keybox_service
     start vendor.keymaster-4-0-beanpod
@@ -39,7 +40,8 @@ on post-fs
     start vendor.gatekeeper-1-0
     start keymaster_attestation-1-1
     
-    sleep 2
+    # Wait for keymaster to be ready
+    wait_for_prop init.svc.vendor.keymaster-4-0-beanpod running
     
     start vold
 
@@ -89,9 +91,20 @@ on post-fs-data-tee
     chown system system /data/vendor/key_provisioning
     restorecon_recursive /data/vendor/thh
 
-# PREVENT REBOOT LOOP
-on property:sys.powerctl=*
+# PREVENT BOOTLOOP - only block plain reboots
+on property:sys.powerctl=reboot$
+    exec_background /system/bin/sh -c "echo 'PLAIN REBOOT BLOCKED' >> /cache/recovery_debug.log"
     setprop sys.powerctl ""
+
+# Allow targeted reboots
+on property:sys.powerctl=reboot,bootloader
+    exec_background /system/bin/sh -c "echo 'BOOTLOADER/FASTBOOTD REBOOT' >> /cache/recovery_debug.log"
+
+on property:sys.powerctl=reboot,recovery
+    exec_background /system/bin/sh -c "echo 'RECOVERY REBOOT' >> /cache/recovery_debug.log"
+
+on property:sys.powerctl=reboot,download
+    exec_background /system/bin/sh -c "echo 'DOWNLOAD REBOOT' >> /cache/recovery_debug.log"
 
 # SERVICES
 service servicemanager /system/bin/servicemanager
