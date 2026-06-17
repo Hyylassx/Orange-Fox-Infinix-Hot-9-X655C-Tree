@@ -28,7 +28,7 @@ on init
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev discard
+    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev
     restorecon_recursive /metadata
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
