@@ -5,7 +5,6 @@ on early-init
     setprop selinux.reload_policy 0
 
 on init
-    exec_background /system/bin/sh -c "logcat -f /cache/recovery_logcat.log -v threadtime &"
     mkdir /tmp 0777 root root
     restorecon /tmp
     mkdir /dev/cpuset 0750 root system
@@ -41,11 +40,6 @@ on post-fs
     symlink /dev/block/sdb /dev/block/mmcblk0boot1
     symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
-    wait /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod 30000
-    
-    # Now that /vendor is confirmed mounted, start the TEE and HALs
-    class_start early_hal
-    start teei_daemon
 
 on boot
     chmod 0666 /dev/input/event0
@@ -54,6 +48,7 @@ on boot
     chmod 0666 /dev/input/event3
     chmod 0666 /dev/input/event4
     chmod 0666 /dev/input/event5
+    start wait_for_vendor_tee
 
 on post-fs-data
     start logd
@@ -72,7 +67,6 @@ on property:init.svc.teei_daemon=running
 on property:init.svc.vendor.keymaster-4-0-beanpod=running
     wait_for_prop init.svc.vendor.keymaster-4-0-beanpod running
     wait_for_prop vendor.microtrust.tee.ready true
-    setprop vold.post_fs_data_done 1
     start vold
 
 on property:init.svc.vold=running
@@ -129,7 +123,7 @@ on property:vold.decrypt=trigger_restart_min_framework
     
 
 on property:vold.decrypt=trigger_reset_main
-    exec_background /system/bin/sh -c "dmesg >> /cache/vold_fail_dmesg.log; getprop >> /cache/vold_fail_props.log"
+    # exec_background /system/bin/sh -c "dmesg >> /cache/vold_fail_dmesg.log; getprop >> /cache/vold_fail_props.log"
     stop vold
 
 on property:vendor.crypto.fake_encrypt=1 && property:vold.post_fs_data_done=1
@@ -150,6 +144,15 @@ on property:sys.powerctl=reboot,recovery
     setprop sys.powerctl ""
 
 # CORE SERVICES
+
+service wait_for_vendor_tee /sbin/sh -c "while [ ! -f /vendor/bin/teei_daemon ]; do sleep 1; done; start teei_daemon; class_start early_hal"
+    class main
+    user root
+    group root
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
 service servicemanager /system/bin/servicemanager
     class core
     user root
