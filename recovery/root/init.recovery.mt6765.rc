@@ -36,13 +36,13 @@ on init
     setprop ro.boot.usbcontroller musb-hdrc
     setprop sys.init_fatal_vold.reboot 0
     
-    # Android 10 VNDK 29 Paths
-    export LD_LIBRARY_PATH /system/lib64/vndk-29:/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin
+    # Android 10 VNDK 29 Paths 
+    export LD_LIBRARY_PATH /system_root/system/lib64/vndk-29:/system_root/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin
     
     # Encryption Properties
     setprop ro.crypto.state encrypted
     setprop ro.crypto.type file
-    setprop ro.crypto.volume.filenames_mode aes-256-cts
+    setprop ro.crypto.volume.filenames_mode aes-256-xts
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
@@ -53,7 +53,7 @@ on fs
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
     
-    # CRITICAL: TEE Device Node Permissions (Extracted from stock microtrust.rc)
+    # CRITICAL: TEE Device Node Permissions
     chmod 0660 /dev/teei_client
     chown system system /dev/teei_client
     chmod 0660 /dev/teei_config
@@ -96,7 +96,7 @@ on post-fs
     mkdir /mnt/vendor/nvdata/media 0771 media audio
     restorecon_recursive /mnt/vendor/nvdata
     
-    # RPMB Directories (Required for secure key storage)
+    # RPMB Directories
     chown system system /mnt/vendor/persist
     chmod 0771 /mnt/vendor/persist
     restorecon_recursive /mnt/vendor/persist
@@ -156,7 +156,7 @@ on property:vold.decrypt=trigger_restart_framework
     mkdir /data/local/tmp 0771 shell shell
     mkdir /data/data 0771 system system
     
-    # CRITICAL: TEE THH Directories (Extracted from stock microtrust.rc)
+    # CRITICAL: TEE THH Directories
     mkdir /data/vendor/thh 0755 system system
     mkdir /data/vendor/thh/ta 0755 system system
     mkdir /data/vendor/thh/system 0755 system system
@@ -265,9 +265,8 @@ service logd /system/bin/logd
     writepid /dev/cpuset/system-background/tasks
     seclabel u:r:logd:s0
 
-service vold /system/bin/vold \
-        --blkid_context=u:r:blkid:s0 --blkid_untrusted_context=u:r:blkid_untrusted:s0 \
-        --fsck_context=u:r:fsck:s0 --fsck_untrusted_context=u:r:fsck_untrusted:s0
+# CRITICAL FIX: Wrapped vold to inject VNDK-29 libraries safely
+service vold /system/bin/sh -c "export LD_LIBRARY_PATH=/system_root/system/lib64/vndk-29:/system_root/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin; exec /system/bin/vold --blkid_context=u:r:blkid:s0 --blkid_untrusted_context=u:r:blkid_untrusted:s0 --fsck_context=u:r:fsck:s0 --fsck_untrusted_context=u:r:fsck_untrusted:s0"
     class core
     ioprio be 2
     writepid /dev/cpuset/foreground/tasks
@@ -276,14 +275,16 @@ service vold /system/bin/vold \
     disabled
     seclabel u:r:vold:s0
 
-service gatekeeperd /system/bin/gatekeeperd /data/misc/gatekeeper
+# CRITICAL FIX: Wrapped gatekeeperd to inject VNDK-29 libraries safely
+service gatekeeperd /system/bin/sh -c "export LD_LIBRARY_PATH=/system_root/system/lib64/vndk-29:/system_root/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin; exec /system/bin/gatekeeperd /data/misc/gatekeeper"
     class late_start
     user system
     writepid /dev/cpuset/system-background/tasks
     disabled
     seclabel u:r:recovery:s0
 
-service keystore /system/bin/keystore /data/misc/keystore
+# CRITICAL FIX: Wrapped keystore to inject VNDK-29 libraries safely
+service keystore /system/bin/sh -c "export LD_LIBRARY_PATH=/system_root/system/lib64/vndk-29:/system_root/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin; exec /system/bin/keystore /data/misc/keystore"
     class main
     user keystore
     group keystore drmrpc readproc log
@@ -300,7 +301,9 @@ service beanpod_check_keybox_service /vendor/bin/bp_kmsetkey_ca -c
     seclabel u:r:recovery:s0
 
 # HAL SERVICES
-service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod
+
+# CRITICAL FIX: Wrapped keymaster to inject VNDK-29 libraries safely
+service vendor.keymaster-4-0-beanpod /system/bin/sh -c "export LD_LIBRARY_PATH=/system_root/system/lib64/vndk-29:/system_root/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin; exec /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod"
     class early_hal
     user root
     group root
