@@ -28,7 +28,6 @@ service teei_daemon /vendor/bin/teei_daemon \
     seclabel u:r:recovery:s0
 
 on fs
-    # TEE device nodes - must be set before teei_daemon starts
     chmod 0660 /dev/teei_client
     chown system system /dev/teei_client
     chmod 0660 /dev/teei_config
@@ -51,18 +50,14 @@ on fs
     chown root root /dev/tee_log
 
 on post-fs
-    # Setup RPMB secure storage paths if partitions are mounted
     exec_background /system/bin/sh -c "if [ -d /mnt/vendor/persist ]; then chown system system /mnt/vendor/persist; chmod 0771 /mnt/vendor/persist; mkdir -p /mnt/vendor/persist/rpmb; chown system system /mnt/vendor/persist/rpmb; chmod 0771 /mnt/vendor/persist/rpmb; fi"
     exec_background /system/bin/sh -c "if [ -d /persist ]; then mkdir -p /persist/rpmb; chmod 0771 /persist/rpmb; chown system system /persist/rpmb; fi"
     exec_background /system/bin/sh -c "if [ -d /vendor/persist ]; then mkdir -p /vendor/persist/rpmb; chmod 0771 /vendor/persist/rpmb; chown system system /vendor/persist/rpmb; fi"
     
-    #  CRITICAL: Signal TEE is ready for crypto operations
     setprop vendor.microtrust.tee.ready true
-    logw " TEE READY - Crypto operations available"
+    log " TEE READY - Crypto operations available"
 
-#  FIXED: Create BOTH /data/misc AND /data/vendor/thh
 on property:vold.decrypt=trigger_restart_framework
-    # CRITICAL: Create /data/misc FIRST (required for decryption keys)
     mkdir /data/misc 01771 system misc
     mkdir /data/misc/keystore 0700 keystore keystore
     mkdir /data/misc/vold 0700 root root
@@ -77,7 +72,6 @@ on property:vold.decrypt=trigger_restart_framework
     mkdir /data/local/tmp 0771 shell shell
     mkdir /data/data 0771 system system
     
-    # Fix SELinux contexts
     restorecon /data/misc
     restorecon /data/misc/keystore
     restorecon /data/misc/vold
@@ -85,7 +79,6 @@ on property:vold.decrypt=trigger_restart_framework
     restorecon /data/misc/systemkeys
     restorecon /data/system
     
-    # Then create thh directories
     mkdir /data/vendor/thh 0755 system system
     mkdir /data/vendor/thh/system 0755 system system
     mkdir /data/vendor/thh/tee_00 0755 system system
@@ -157,9 +150,7 @@ on property:vold.decrypt=trigger_restart_framework
     
     trigger post-fs-data-tee
 
-# Also handle min_framework trigger
 on property:vold.decrypt=trigger_restart_min_framework
-    # CRITICAL: Create /data/misc FIRST
     mkdir /data/misc 01771 system misc
     mkdir /data/misc/keystore 0700 keystore keystore
     mkdir /data/misc/vold 0700 root root
@@ -181,7 +172,6 @@ on property:vold.decrypt=trigger_restart_min_framework
     restorecon /data/misc/systemkeys
     restorecon /data/system
     
-    # Then create thh directories
     mkdir /data/vendor/thh 0755 system system
     mkdir /data/vendor/thh/system 0755 system system
     mkdir /data/vendor/thh/tee_00 0755 system system
@@ -249,7 +239,11 @@ on property:vold.decrypt=trigger_restart_min_framework
     chmod 0771 /data/vendor/key_provisioning
     chown system system /data/vendor/key_provisioning
 
-# Fallback for factory/recovery mode without real encryption
+on property:vold.decrypt=trigger_reset_main
+    exec_background /system/bin/sh -c "dmesg >> /cache/vold_fail_dmesg.log; getprop >> /cache/vold_fail_props.log"
+    stop vold
+
 on property:vendor.crypto.fake_encrypt=1 && property:vold.post_fs_data_done=1
     setprop vendor.soter.teei.crypto.state unencrypted
-    logw "⚠️ Using fake encryption (no real decryption)"
+    log "⚠️ Using fake encryption (no real decryption)"
+
