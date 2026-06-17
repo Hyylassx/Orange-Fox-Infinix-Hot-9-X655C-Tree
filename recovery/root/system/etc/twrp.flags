@@ -6,11 +6,13 @@
 /vendor          ext4    vendor                                         flags=display="Vendor";backup=1;logical;flashimg=1;wipeingui
 /product         ext4    product                                        flags=display="Product";backup=1;logical;flashimg=1;wipeingui
 
+
 # GSI Target & SUPER (Necessary for flashing .img raw images to logical slots)
-/system_image    emmc    /dev/block/by-name/system                      flags=display="System Image";flashimg=1;backup=0
-/vendor_image    emmc    /dev/block/by-name/vendor                      flags=display="Vendor Image";flashimg=1;backup=0
-/product_image   emmc    /dev/block/by-name/product                     flags=display="Product Image";flashimg=1;backup=0
-/super           emmc    /dev/block/by-name/super                       flags=display="Super Partition";backup=1;flashimg=1
+/system_image    emmc    /dev/block/mapper/system                      flags=display="System Image";flashimg=1;backup=0
+/vendor_image    emmc    /dev/block/mapper/vendor                      flags=display="Vendor Image";flashimg=1;backup=0
+/product_image   emmc    /dev/block/mapper/product                     flags=display="Product Image";flashimg=1;backup=0
+/super           emmc    /dev/block/by-name/super                      flags=display="Super Partition";backup=1;flashimg=1
+
 
 # Core Storages
 /metadata        ext4    /dev/block/by-name/md_udc                      flags=backup=1;display="Metadata"
