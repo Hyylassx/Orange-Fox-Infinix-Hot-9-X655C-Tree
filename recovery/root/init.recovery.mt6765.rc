@@ -1,17 +1,13 @@
 import /init.recovery.microtrust.rc
 
 on early-init
-    # CRITICAL: Set SELinux to permissive to allow TEE/Keymaster to start
     write /sys/fs/selinux/enforce 0
     setprop selinux.reload_policy 0
 
 on init
-    # Save logcat to /cache so we don't lose vold/teei logs on reboot
     exec_background /system/bin/sh -c "logcat -f /cache/recovery_logcat.log -v threadtime &"
-
     mkdir /tmp 0777 root root
     restorecon /tmp
-
     mkdir /dev/cpuset 0750 root system
     mount cgroup none /dev/cpuset cpuset
     mkdir /dev/cpuset/foreground 0750 root system
@@ -21,35 +17,23 @@ on init
     write /dev/cpuset/foreground/tasks 1
     write /dev/cpuset/background/tasks 1
     write /dev/cpuset/system-background/tasks 1
-
     mkdir /dev/cg2_bpf 0750 root system
     mount cgroup2 none /dev/cg2_bpf nodev noexec nosuid
-
     setprop sys.usb.configfs 1
     setprop sys.usb.ffs.aio_compat 1
     setprop sys.usb.controller musb-hdrc
     setprop ro.boot.usbcontroller musb-hdrc
     setprop sys.init_fatal_vold.reboot 0
-
-    #  VNDK-29 for Android 10+ GSI compatibility
     export LD_LIBRARY_PATH /system_root/system/lib64/vndk-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-
-    #  Mount vendor for GSI compatibility (CRITICAL!)
     wait /dev/block/platform/bootdevice/by-name/vendor
     mount ext4 /dev/block/mapper/vendor /vendor ro barrier=1
-
-    # Mount metadata with correct SELinux context
     mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata noatime,nosuid,nodev,discard
     restorecon_recursive /metadata
-
-    # Ensure vold metadata dir exists
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
-
-    # Start core services before TEE
     start servicemanager
     start hwservicemanager
     start hidl_memory
@@ -62,13 +46,8 @@ on post-fs
     chmod 0755 /sbin/foxstart.sh
 
 on late-fs
-    # CRITICAL: Stop Android 12 keystore2 from crashing on Android 10 vendor!
     stop keystore2
-    
-    # Wait for hwservicemanager just like stock MTK does
     wait_for_prop hwservicemanager.ready true
-    
-    # Now safe to start early HALs and TEE
     class_start early_hal
     start teei_daemon
 
@@ -81,55 +60,36 @@ on boot
     chmod 0666 /dev/input/event5
 
 on post-fs-data
-    # /data/misc is NOT created here anymore.
-    # It will be created AFTER vold decrypts /data to prevent set_policy_failed panic.
     start logd
 
-# ============================================
-#  FIXED: TEE / KEYMASTER / VOLD TRIGGER CHAIN
-# ============================================
+#  TEE / KEYMASTER / VOLD TRIGGER CHAIN
 
-#  FIX 1: Wait for TEE to be FULLY ready (not just process)
 on property:init.svc.teei_daemon=running
     wait_for_prop vendor.microtrust.tee.ready true
     timeout 30
         logw "TEE not ready after 30s, continuing anyway"
-    
     start beanpod_check_keybox_service
     start vendor.keymaster-4-0-beanpod
     start teei_capi_2_0
     start vendor.gatekeeper-1-0
     start keymaster_attestation-1-1
 
-#  FIX 2: Wait for BOTH keymaster AND TEE, then set vold.post_fs_data_done
 on property:init.svc.vendor.keymaster-4-0-beanpod=running
     wait_for_prop init.svc.vendor.keymaster-4-0-beanpod running
     wait_for_prop vendor.microtrust.tee.ready true
     timeout 30
         logw "Keymaster not ready after 30s"
-    
-    #  CRITICAL: Tell vold data is ready (THIS WAS REMOVED IN OLD BUILDS!)
     setprop vold.post_fs_data_done 1
-    
-    # NOW start vold (TEE + Keymaster are ready)
     start vold
 
-# FIX 3: Start keystore/gatekeeper BEFORE vold decrypts
 on property:init.svc.vold=running
-    # Give vold time to attempt decryption
     sleep 3
-    
-    #  Start keystore and gatekeeper NOW (not after vold fails!)
     start keystore
     start gatekeeperd
-    
-    # Wait for them to be ready
     wait_for_prop init.svc.keystore running
     wait_for_prop init.svc.gatekeeperd running
 
-# FIX 4: Force decryption if vold didn't trigger it
 on property:vold.decrypt=trigger_restart_framework
-    #  CRITICAL: Create /data/misc FIRST (required for decryption keys)
     mkdir /data/misc 01771 system misc
     mkdir /data/misc/keystore 0700 keystore keystore
     mkdir /data/misc/vold 0700 root root
@@ -144,88 +104,16 @@ on property:vold.decrypt=trigger_restart_framework
     mkdir /data/local/tmp 0771 shell shell
     mkdir /data/data 0771 system system
     
-    #  Fix SELinux contexts
     restorecon /data/misc
     restorecon /data/misc/keystore
     restorecon /data/misc/vold
     restorecon /data/misc/gatekeeper
     restorecon /data/misc/systemkeys
     restorecon /data/system
-    
-    # Then create thh directories
-    mkdir /data/vendor/thh 0755 system system
-    mkdir /data/vendor/thh/system 0755 system system
-    mkdir /data/vendor/thh/tee_00 0755 system system
-    mkdir /data/vendor/thh/tee_01 0755 system system
-    mkdir /data/vendor/thh/tee_02 0755 system system
-    mkdir /data/vendor/thh/tee_03 0755 system system
-    mkdir /data/vendor/thh/tee_04 0755 system system
-    mkdir /data/vendor/thh/tee_05 0755 system system
-    mkdir /data/vendor/thh/tee_06 0755 system system
-    mkdir /data/vendor/thh/tee_07 0755 system system
-    mkdir /data/vendor/thh/tee 0755 system system
-    mkdir /data/vendor/thh/tee/tas 0755 system system
-    mkdir /data/vendor/thh/tee_08 0755 system system
-    mkdir /data/vendor/thh/tee_09 0755 system system
-    mkdir /data/vendor/thh/tee_0A 0755 system system
-    mkdir /data/vendor/thh/tee_0B 0755 system system
-    mkdir /data/vendor/thh/tee_0C 0755 system system
-    mkdir /data/vendor/thh/tee_0D 0755 system system
-    mkdir /data/vendor/thh/tee_0E 0755 system system
-    mkdir /data/vendor/thh/tee_0F 0755 system system
-    mkdir /data/vendor/thh/ta 0755 system system
-    mkdir /data/vendor/key_provisioning 0771 system system
-    
-    chmod 0755 /data/vendor/thh
-    chown system system /data/vendor/thh
-    chmod 0755 /data/vendor/thh/system
-    chown system system /data/vendor/thh/system
-    chmod 0755 /data/vendor/thh/tee_00
-    chown system system /data/vendor/thh/tee_00
-    chmod 0755 /data/vendor/thh/tee_01
-    chown system system /data/vendor/thh/tee_01
-    chmod 0755 /data/vendor/thh/tee_02
-    chown system system /data/vendor/thh/tee_02
-    chmod 0755 /data/vendor/thh/tee_03
-    chown system system /data/vendor/thh/tee_03
-    chmod 0755 /data/vendor/thh/tee_04
-    chown system system /data/vendor/thh/tee_04
-    chmod 0755 /data/vendor/thh/tee_05
-    chown system system /data/vendor/thh/tee_05
-    chmod 0755 /data/vendor/thh/tee_06
-    chown system system /data/vendor/thh/tee_06
-    chmod 0755 /data/vendor/thh/tee_07
-    chown system system /data/vendor/thh/tee_07
-    chmod 0755 /data/vendor/thh/tee
-    chown system system /data/vendor/thh/tee
-    chmod 0755 /data/vendor/thh/tee/tas
-    chown system system /data/vendor/thh/tee/tas
-    chmod 0755 /data/vendor/thh/tee_08
-    chown system system /data/vendor/thh/tee_08
-    chmod 0755 /data/vendor/thh/tee_09
-    chown system system /data/vendor/thh/tee_09
-    chmod 0755 /data/vendor/thh/tee_0A
-    chown system system /data/vendor/thh/tee_0A
-    chmod 0755 /data/vendor/thh/tee_0B
-    chown system system /data/vendor/thh/tee_0B
-    chmod 0755 /data/vendor/thh/tee_0C
-    chown system system /data/vendor/thh/tee_0C
-    chmod 0755 /data/vendor/thh/tee_0D
-    chown system system /data/vendor/thh/tee_0D
-    chmod 0755 /data/vendor/thh/tee_0E
-    chown system system /data/vendor/thh/tee_0E
-    chmod 0755 /data/vendor/thh/tee_0F
-    chown system system /data/vendor/thh/tee_0F
-    chmod 0755 /data/vendor/thh/ta
-    chown system system /data/vendor/thh/ta
-    chmod 0771 /data/vendor/key_provisioning
-    chown system system /data/vendor/key_provisioning
-    restorecon_recursive /data/vendor/thh
     
     trigger post-fs-data-tee
 
 on property:vold.decrypt=trigger_restart_min_framework
-    #  CRITICAL: Create /data/misc FIRST
     mkdir /data/misc 01771 system misc
     mkdir /data/misc/keystore 0700 keystore keystore
     mkdir /data/misc/vold 0700 root root
@@ -247,73 +135,6 @@ on property:vold.decrypt=trigger_restart_min_framework
     restorecon /data/misc/systemkeys
     restorecon /data/system
     
-    # Then create thh directories
-    mkdir /data/vendor/thh 0755 system system
-    mkdir /data/vendor/thh/system 0755 system system
-    mkdir /data/vendor/thh/tee_00 0755 system system
-    mkdir /data/vendor/thh/tee_01 0755 system system
-    mkdir /data/vendor/thh/tee_02 0755 system system
-    mkdir /data/vendor/thh/tee_03 0755 system system
-    mkdir /data/vendor/thh/tee_04 0755 system system
-    mkdir /data/vendor/thh/tee_05 0755 system system
-    mkdir /data/vendor/thh/tee_06 0755 system system
-    mkdir /data/vendor/thh/tee_07 0755 system system
-    mkdir /data/vendor/thh/tee 0755 system system
-    mkdir /data/vendor/thh/tee/tas 0755 system system
-    mkdir /data/vendor/thh/tee_08 0755 system system
-    mkdir /data/vendor/thh/tee_09 0755 system system
-    mkdir /data/vendor/thh/tee_0A 0755 system system
-    mkdir /data/vendor/thh/tee_0B 0755 system system
-    mkdir /data/vendor/thh/tee_0C 0755 system system
-    mkdir /data/vendor/thh/tee_0D 0755 system system
-    mkdir /data/vendor/thh/tee_0E 0755 system system
-    mkdir /data/vendor/thh/tee_0F 0755 system system
-    mkdir /data/vendor/thh/ta 0755 system system
-    mkdir /data/vendor/key_provisioning 0771 system system
-    chmod 0755 /data/vendor/thh
-    chown system system /data/vendor/thh
-    chmod 0755 /data/vendor/thh/system
-    chown system system /data/vendor/thh/system
-    chmod 0755 /data/vendor/thh/tee_00
-    chown system system /data/vendor/thh/tee_00
-    chmod 0755 /data/vendor/thh/tee_01
-    chown system system /data/vendor/thh/tee_01
-    chmod 0755 /data/vendor/thh/tee_02
-    chown system system /data/vendor/thh/tee_02
-    chmod 0755 /data/vendor/thh/tee_03
-    chown system system /data/vendor/thh/tee_03
-    chmod 0755 /data/vendor/thh/tee_04
-    chown system system /data/vendor/thh/tee_04
-    chmod 0755 /data/vendor/thh/tee_05
-    chown system system /data/vendor/thh/tee_05
-    chmod 0755 /data/vendor/thh/tee_06
-    chown system system /data/vendor/thh/tee_06
-    chmod 0755 /data/vendor/thh/tee_07
-    chown system system /data/vendor/thh/tee_07
-    chmod 0755 /data/vendor/thh/tee
-    chown system system /data/vendor/thh/tee
-    chmod 0755 /data/vendor/thh/tee/tas
-    chown system system /data/vendor/thh/tee/tas
-    chmod 0755 /data/vendor/thh/tee_08
-    chown system system /data/vendor/thh/tee_08
-    chmod 0755 /data/vendor/thh/tee_09
-    chown system system /data/vendor/thh/tee_09
-    chmod 0755 /data/vendor/thh/tee_0A
-    chown system system /data/vendor/thh/tee_0A
-    chmod 0755 /data/vendor/thh/tee_0B
-    chown system system /data/vendor/thh/tee_0B
-    chmod 0755 /data/vendor/thh/tee_0C
-    chown system system /data/vendor/thh/tee_0C
-    chmod 0755 /data/vendor/thh/tee_0D
-    chown system system /data/vendor/thh/tee_0D
-    chmod 0755 /data/vendor/thh/tee_0E
-    chown system system /data/vendor/thh/tee_0E
-    chmod 0755 /data/vendor/thh/tee_0F
-    chown system system /data/vendor/thh/tee_0F
-    chmod 0755 /data/vendor/thh/ta
-    chown system system /data/vendor/thh/ta
-    chmod 0771 /data/vendor/key_provisioning
-    chown system system /data/vendor/key_provisioning
 
 on property:vold.decrypt=trigger_reset_main
     exec_background /system/bin/sh -c "dmesg >> /cache/vold_fail_dmesg.log; getprop >> /cache/vold_fail_props.log"
@@ -322,78 +143,8 @@ on property:vold.decrypt=trigger_reset_main
 on property:vendor.crypto.fake_encrypt=1 && property:vold.post_fs_data_done=1
     setprop vendor.soter.teei.crypto.state unencrypted
 
-on post-fs-data-tee
-    mkdir /data/vendor/thh 0755 system system
-    mkdir /data/vendor/thh/system 0755 system system
-    mkdir /data/vendor/thh/tee_00 0755 system system
-    mkdir /data/vendor/thh/tee_01 0755 system system
-    mkdir /data/vendor/thh/tee_02 0755 system system
-    mkdir /data/vendor/thh/tee_03 0755 system system
-    mkdir /data/vendor/thh/tee_04 0755 system system
-    mkdir /data/vendor/thh/tee_05 0755 system system
-    mkdir /data/vendor/thh/tee_06 0755 system system
-    mkdir /data/vendor/thh/tee_07 0755 system system
-    mkdir /data/vendor/thh/tee 0755 system system
-    mkdir /data/vendor/thh/tee/tas 0755 system system
-    mkdir /data/vendor/thh/tee_08 0755 system system
-    mkdir /data/vendor/thh/tee_09 0755 system system
-    mkdir /data/vendor/thh/tee_0A 0755 system system
-    mkdir /data/vendor/thh/tee_0B 0755 system system
-    mkdir /data/vendor/thh/tee_0C 0755 system system
-    mkdir /data/vendor/thh/tee_0D 0755 system system
-    mkdir /data/vendor/thh/tee_0E 0755 system system
-    mkdir /data/vendor/thh/tee_0F 0755 system system
-    mkdir /data/vendor/thh/ta 0755 system system
-    mkdir /data/vendor/key_provisioning 0771 system system
-    chmod 0755 /data/vendor/thh
-    chown system system /data/vendor/thh
-    chmod 0755 /data/vendor/thh/system
-    chown system system /data/vendor/thh/system
-    chmod 0755 /data/vendor/thh/tee_00
-    chown system system /data/vendor/thh/tee_00
-    chmod 0755 /data/vendor/thh/tee_01
-    chown system system /data/vendor/thh/tee_01
-    chmod 0755 /data/vendor/thh/tee_02
-    chown system system /data/vendor/thh/tee_02
-    chmod 0755 /data/vendor/thh/tee_03
-    chown system system /data/vendor/thh/tee_03
-    chmod 0755 /data/vendor/thh/tee_04
-    chown system system /data/vendor/thh/tee_04
-    chmod 0755 /data/vendor/thh/tee_05
-    chown system system /data/vendor/thh/tee_05
-    chmod 0755 /data/vendor/thh/tee_06
-    chown system system /data/vendor/thh/tee_06
-    chmod 0755 /data/vendor/thh/tee_07
-    chown system system /data/vendor/thh/tee_07
-    chmod 0755 /data/vendor/thh/tee
-    chown system system /data/vendor/thh/tee
-    chmod 0755 /data/vendor/thh/tee/tas
-    chown system system /data/vendor/thh/tee/tas
-    chmod 0755 /data/vendor/thh/tee_08
-    chown system system /data/vendor/thh/tee_08
-    chmod 0755 /data/vendor/thh/tee_09
-    chown system system /data/vendor/thh/tee_09
-    chmod 0755 /data/vendor/thh/tee_0A
-    chown system system /data/vendor/thh/tee_0A
-    chmod 0755 /data/vendor/thh/tee_0B
-    chown system system /data/vendor/thh/tee_0B
-    chmod 0755 /data/vendor/thh/tee_0C
-    chown system system /data/vendor/thh/tee_0C
-    chmod 0755 /data/vendor/thh/tee_0D
-    chown system system /data/vendor/thh/tee_0D
-    chmod 0755 /data/vendor/thh/tee_0E
-    chown system system /data/vendor/thh/tee_0E
-    chmod 0755 /data/vendor/thh/tee_0F
-    chown system system /data/vendor/thh/tee_0F
-    chmod 0755 /data/vendor/thh/ta
-    chown system system /data/vendor/thh/ta
-    chmod 0771 /data/vendor/key_provisioning
-    chown system system /data/vendor/key_provisioning
-    restorecon_recursive /data/vendor/thh
-
-# ============================================
 # PREVENT BOOTLOOP & FASTBOOT REBOOTS
-# ============================================
+
 on property:sys.powerctl=reboot
     exec_background /system/bin/sh -c "echo 'REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
     setprop sys.powerctl ""
