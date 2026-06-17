@@ -3,10 +3,13 @@ import /init.recovery.microtrust.rc
 on early-init
     write /sys/fs/selinux/enforce 0
     setprop selinux.reload_policy 0
+    write /proc/1/oom_score_adj -1000
 
 on init
     mkdir /tmp 0777 root root
     restorecon /tmp
+    
+    # Cgroups
     mkdir /dev/cpuset 0750 root system
     mount cgroup none /dev/cpuset cpuset
     mkdir /dev/cpuset/foreground 0750 root system
@@ -18,19 +21,58 @@ on init
     write /dev/cpuset/system-background/tasks 1
     mkdir /dev/cg2_bpf 0750 root system
     mount cgroup2 none /dev/cg2_bpf nodev noexec nosuid
+    
+    # MTK Security & TEE Directories
+    mkdir /mnt/vendor/protect_f 0771 system system
+    mkdir /mnt/vendor/protect_s 0771 system system
+    mkdir /mnt/vendor/nvdata 0771 system system
+    mkdir /mnt/vendor/nvcfg 0771 system system
+    mkdir /mnt/vendor/persist 0771 system system
+    
+    # USB & System Props
     setprop sys.usb.configfs 1
     setprop sys.usb.ffs.aio_compat 1
     setprop sys.usb.controller musb-hdrc
     setprop ro.boot.usbcontroller musb-hdrc
     setprop sys.init_fatal_vold.reboot 0
-    export LD_LIBRARY_PATH /system_root/system/lib64/vndk-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin
+    
+    # Android 10 VNDK 29 Paths
+    export LD_LIBRARY_PATH /system/lib64/vndk-29:/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin
+    
+    # Encryption Properties
+    setprop ro.crypto.state encrypted
+    setprop ro.crypto.type file
+    setprop ro.crypto.volume.filenames_mode aes-256-cts
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
+    
+    # Mount metadata
     mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev
     restorecon_recursive /metadata
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
+    
+    # CRITICAL: TEE Device Node Permissions (Extracted from stock microtrust.rc)
+    chmod 0660 /dev/teei_client
+    chown system system /dev/teei_client
+    chmod 0660 /dev/teei_config
+    chown system system /dev/teei_config
+    chmod 0666 /dev/tee0
+    chown system drmrpc /dev/tee0
+    chmod 0660 /dev/tz_vfs
+    chown system system /dev/tz_vfs
+    chmod 0660 /dev/teei_fp
+    chown system system /dev/teei_fp
+    chown system drmrpc /dev/ut_keymaster
+    chmod 0660 /dev/ut_keymaster
+    chmod 0660 /dev/rpmb0
+    chown system system /dev/rpmb0
+    chmod 0660 /dev/emmcrpmb0
+    chown system system /dev/emmcrpmb0
+    chown system system /dev/utr_tui
+    chmod 0660 /dev/utr_tui
+    
     start servicemanager
     start hwservicemanager
     start hidl_memory
@@ -40,6 +82,26 @@ on post-fs
     symlink /dev/block/sdb /dev/block/mmcblk0boot1
     symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
+    
+    # MTK Security Directories Permissions
+    chown system system /mnt/vendor/protect_f
+    chmod 0770 /mnt/vendor/protect_f
+    chown system system /mnt/vendor/protect_s
+    chmod 0770 /mnt/vendor/protect_s
+    chown system system /mnt/vendor/nvcfg
+    chmod 0771 /mnt/vendor/nvcfg
+    restorecon_recursive /mnt/vendor/nvcfg
+    chown root system /mnt/vendor/nvdata
+    chmod 0771 /mnt/vendor/nvdata
+    mkdir /mnt/vendor/nvdata/media 0771 media audio
+    restorecon_recursive /mnt/vendor/nvdata
+    
+    # RPMB Directories (Required for secure key storage)
+    chown system system /mnt/vendor/persist
+    chmod 0771 /mnt/vendor/persist
+    restorecon_recursive /mnt/vendor/persist
+    mkdir /mnt/vendor/persist/rpmb 0771 system system
+    restorecon_recursive /mnt/vendor/persist/rpmb
 
 on boot
     start wait_for_vendor_tee
@@ -56,9 +118,9 @@ on post-fs-data
 #  TEE / KEYMASTER / VOLD TRIGGER CHAIN
 
 on property:init.svc.teei_daemon=running
-    # Native 2-second timeout built into wait_for_prop
     wait_for_prop vendor.microtrust.tee.ready true
     start beanpod_check_keybox_service
+    start keyinstall-1-0
     start vendor.keymaster-4-0-beanpod
     start teei_capi_2_0
     start vendor.gatekeeper-1-0
@@ -67,6 +129,7 @@ on property:init.svc.teei_daemon=running
 on property:init.svc.vendor.keymaster-4-0-beanpod=running
     wait_for_prop init.svc.vendor.keymaster-4-0-beanpod running
     wait_for_prop vendor.microtrust.tee.ready true
+    exec_background /system/bin/sh -c "sleep 2"
     start vold
 
 on property:init.svc.vold=running
@@ -83,12 +146,22 @@ on property:vold.decrypt=trigger_restart_framework
     mkdir /data/misc/systemkeys 0700 system system
     mkdir /data/system 0775 system system
     mkdir /data/system_ce 0770 system system
+    mkdir /data/system_de 0770 system system
     mkdir /data/misc_ce 01771 system misc
+    mkdir /data/misc_de 01771 system misc
     mkdir /data/vendor 0771 root root
     mkdir /data/vendor_ce 0771 root root
+    mkdir /data/vendor_de 0771 root root
     mkdir /data/media 0770 media_rw media_rw
     mkdir /data/local/tmp 0771 shell shell
     mkdir /data/data 0771 system system
+    
+    # CRITICAL: TEE THH Directories (Extracted from stock microtrust.rc)
+    mkdir /data/vendor/thh 0755 system system
+    mkdir /data/vendor/thh/ta 0755 system system
+    mkdir /data/vendor/thh/system 0755 system system
+    mkdir /data/vendor/key_provisioning 0771 system system
+    restorecon_recursive /data/vendor/thh
     
     restorecon /data/misc
     restorecon /data/misc/keystore
@@ -97,6 +170,7 @@ on property:vold.decrypt=trigger_restart_framework
     restorecon /data/misc/systemkeys
     restorecon /data/system
     
+    installkey /data
     trigger post-fs-data-tee
 
 on property:vold.decrypt=trigger_restart_min_framework
@@ -107,12 +181,22 @@ on property:vold.decrypt=trigger_restart_min_framework
     mkdir /data/misc/systemkeys 0700 system system
     mkdir /data/system 0775 system system
     mkdir /data/system_ce 0770 system system
+    mkdir /data/system_de 0770 system system
     mkdir /data/misc_ce 01771 system misc
+    mkdir /data/misc_de 01771 system misc
     mkdir /data/vendor 0771 root root
     mkdir /data/vendor_ce 0771 root root
+    mkdir /data/vendor_de 0771 root root
     mkdir /data/media 0770 media_rw media_rw
     mkdir /data/local/tmp 0771 shell shell
     mkdir /data/data 0771 system system
+    
+    # CRITICAL: TEE THH Directories
+    mkdir /data/vendor/thh 0755 system system
+    mkdir /data/vendor/thh/ta 0755 system system
+    mkdir /data/vendor/thh/system 0755 system system
+    mkdir /data/vendor/key_provisioning 0771 system system
+    restorecon_recursive /data/vendor/thh
     
     restorecon /data/misc
     restorecon /data/misc/keystore
@@ -121,31 +205,33 @@ on property:vold.decrypt=trigger_restart_min_framework
     restorecon /data/misc/systemkeys
     restorecon /data/system
     
+    installkey /data
 
 on property:vold.decrypt=trigger_reset_main
-    # exec_background /system/bin/sh -c "dmesg >> /cache/vold_fail_dmesg.log; getprop >> /cache/vold_fail_props.log"
     stop vold
 
 on property:vendor.crypto.fake_encrypt=1 && property:vold.post_fs_data_done=1
     setprop vendor.soter.teei.crypto.state unencrypted
 
-# PREVENT BOOTLOOP & FASTBOOT REBOOTS
+on property:vold.decrypt=trigger_post_fs_data
+    setprop vold.post_fs_data_done 1
 
+# PREVENT BOOTLOOP & FASTBOOT REBOOTS
 on property:sys.powerctl=reboot
-    exec_background /system/bin/sh -c "echo 'REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
+    exec_background /system/bin/sh -c "echo 'REBOOT BLOCKED' >> /cache/recovery_debug.log"
     setprop sys.powerctl ""
 
 on property:sys.powerctl=reboot,bootloader
-    exec_background /system/bin/sh -c "echo 'FASTBOOT REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
+    exec_background /system/bin/sh -c "echo 'FASTBOOT REBOOT BLOCKED' >> /cache/recovery_debug.log"
     setprop sys.powerctl ""
 
 on property:sys.powerctl=reboot,recovery
-    exec_background /system/bin/sh -c "echo 'RECOVERY REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
+    exec_background /system/bin/sh -c "echo 'RECOVERY REBOOT BLOCKED' >> /cache/recovery_debug.log"
     setprop sys.powerctl ""
 
 # CORE SERVICES
 
-service wait_for_vendor_tee /sbin/sh -c "while [ ! -f /vendor/bin/teei_daemon ]; do sleep 1; done; start teei_daemon; class_start early_hal"
+service wait_for_vendor_tee /system/bin/sh -c "while [ ! -f /vendor/bin/teei_daemon ]; do sleep 1; done; start teei_daemon; class_start early_hal"
     class main
     user root
     group root
@@ -192,7 +278,7 @@ service vold /system/bin/vold \
 
 service gatekeeperd /system/bin/gatekeeperd /data/misc/gatekeeper
     class late_start
-    user root
+    user system
     writepid /dev/cpuset/system-background/tasks
     disabled
     seclabel u:r:recovery:s0
@@ -205,18 +291,22 @@ service keystore /system/bin/keystore /data/misc/keystore
     disabled
     seclabel u:r:recovery:s0
 
-service wait_for_keymaster /system/bin/wait_for_keymaster
-    class main
-    user root
-    group root system
-    priority -20
-    ioprio rt 0
-    disabled
+service beanpod_check_keybox_service /vendor/bin/bp_kmsetkey_ca -c
+    class late_start
+    user system
+    group system
     oneshot
+    disabled
     seclabel u:r:recovery:s0
 
 # HAL SERVICES
 service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod
+    class early_hal
+    user root
+    group root
+    disabled
+
+service keyinstall-1-0 /vendor/bin/hw/vendor.mediatek.hardware.keyinstall@1.0-service
     class early_hal
     user root
     group root
