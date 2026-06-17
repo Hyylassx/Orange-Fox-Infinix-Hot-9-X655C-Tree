@@ -1,5 +1,4 @@
 # RECOVERY OPTIMIZED MICROTRUST BEANPOD TEE CONFIGURATION
-# Based on stock microtrust.rc + microtrust.bp_kmsetkey_ca.rc
 
 service teei_daemon /vendor/bin/teei_daemon \
     -r 020b0000000000000000000000000000 \
@@ -21,16 +20,15 @@ service teei_daemon /vendor/bin/teei_daemon \
     -r 7b66512021214487ba710a51d7ea78fe \
     -r 09010000000000000000000000000000
     class core
-    user system
-    group system
-    disabled
+    user root
+    group root
     seclabel u:r:recovery:s0
 
 on fs
-    # TEE device nodes - must be set before teei_daemon starts
-    chmod 0660 /dev/teei_client
+    # TEE device nodes
+    chmod 0666 /dev/teei_client
     chown system system /dev/teei_client
-    chmod 0660 /dev/teei_config
+    chmod 0666 /dev/teei_config
     chown system system /dev/teei_config
     chmod 0666 /dev/tee0
     chown system drmrpc /dev/tee0
@@ -48,17 +46,14 @@ on fs
     chmod 0660 /dev/utr_tui
     chmod 0666 /dev/tee_log
     chown root root /dev/tee_log
-   
-    # NOTE: We do NOT start teei_daemon here like stock does.
-    # It is started by init.recovery.mt6765.rc in late-fs AFTER hwservicemanager is ready.
 
 on post-fs
-    # Setup RPMB secure storage paths if partitions are mounted
+    # Setup RPMB secure storage paths
     exec_background /system/bin/sh -c "if [ -d /mnt/vendor/persist ]; then chown system system /mnt/vendor/persist; chmod 0771 /mnt/vendor/persist; mkdir -p /mnt/vendor/persist/rpmb; chown system system /mnt/vendor/persist/rpmb; chmod 0771 /mnt/vendor/persist/rpmb; fi"
     exec_background /system/bin/sh -c "if [ -d /persist ]; then mkdir -p /persist/rpmb; chmod 0771 /persist/rpmb; chown system system /persist/rpmb; fi"
     exec_background /system/bin/sh -c "if [ -d /vendor/persist ]; then mkdir -p /vendor/persist/rpmb; chmod 0771 /vendor/persist/rpmb; chown system system /vendor/persist/rpmb; fi"
 
-# Create thh dirs ONLY after vold successfully decrypts /data
+# Create thh dirs after vold decrypts
 on property:vold.decrypt=trigger_restart_framework
     mkdir /data/vendor/thh 0755 system system
     mkdir /data/vendor/thh/system 0755 system system
@@ -82,9 +77,10 @@ on property:vold.decrypt=trigger_restart_framework
     mkdir /data/vendor/thh/tee_0F 0755 system system
     mkdir /data/vendor/thh/ta 0755 system system
     mkdir /data/vendor/key_provisioning 0771 system system
-    
     chmod 0755 /data/vendor/thh
     chown system system /data/vendor/thh
+    chmod 0755 /data/vendor/thh/system
+    chown system system /data/vendor/thh/system
     chmod 0755 /data/vendor/thh/tee_00
     chown system system /data/vendor/thh/tee_00
     chmod 0755 /data/vendor/thh/tee_01
@@ -123,13 +119,10 @@ on property:vold.decrypt=trigger_restart_framework
     chown system system /data/vendor/thh/tee_0F
     chmod 0755 /data/vendor/thh/ta
     chown system system /data/vendor/thh/ta
-    chmod 0755 /data/vendor/thh/system
-    chown system system /data/vendor/thh/system
-    restorecon_recursive /data/vendor/thh
     chmod 0771 /data/vendor/key_provisioning
     chown system system /data/vendor/key_provisioning
+    restorecon_recursive /data/vendor/thh
 
-# Also handle min_framework trigger
 on property:vold.decrypt=trigger_restart_min_framework
     mkdir /data/vendor/thh 0755 system system
     mkdir /data/vendor/thh/system 0755 system system
@@ -198,6 +191,5 @@ on property:vold.decrypt=trigger_restart_min_framework
     chmod 0771 /data/vendor/key_provisioning
     chown system system /data/vendor/key_provisioning
 
-# Fallback for factory/recovery mode without real encryption
 on property:vendor.crypto.fake_encrypt=1 && property:vold.post_fs_data_done=1
     setprop vendor.soter.teei.crypto.state unencrypted
