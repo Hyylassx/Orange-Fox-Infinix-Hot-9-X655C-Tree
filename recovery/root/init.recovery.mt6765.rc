@@ -28,8 +28,7 @@ on init
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-    wait /dev/block/mapper/vendor
-    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev,discard
+    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev discard
     restorecon_recursive /metadata
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
@@ -42,12 +41,8 @@ on post-fs
     symlink /dev/block/sdb /dev/block/mmcblk0boot1
     symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
-    chmod 0755 /sbin/foxstart.sh
-    # ==========================================
-    # CRITICAL: Wait for Recovery to finish mounting /vendor
-    # ==========================================
-    # This waits up to 10 seconds for the actual Keymaster binary to appear
-    wait /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod 10
+    wait /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod 25000
+    
     # Now that /vendor is confirmed mounted, start the TEE and HALs
     class_start early_hal
     start teei_daemon
