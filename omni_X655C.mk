@@ -14,14 +14,3 @@ PRODUCT_SHIPPING_API_LEVEL := 29
 PRODUCT_TARGET_VNDK_VERSION := 29
 PRODUCT_PLATFORM := mt6765
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
-
-# === CRITICAL: INCLUDE VOLD AND CRYPTO LIBRARIES FOR DECRYPTION ===
-PRODUCT_PACKAGES += \
-    vold \
-    libvold \
-    libcrypto \
-    libgatekeeper \
-    libkeymaster4support \
-    keystore2 \
-    gatekeeperd \
-    wait_for_keymaster
