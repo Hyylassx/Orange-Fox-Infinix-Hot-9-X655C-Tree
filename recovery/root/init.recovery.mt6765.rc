@@ -46,7 +46,6 @@ on post-fs
     chmod 0755 /sbin/foxstart.sh
 
 on late-fs
-    stop keystore2
     wait_for_prop hwservicemanager.ready true
     class_start early_hal
     start teei_daemon
