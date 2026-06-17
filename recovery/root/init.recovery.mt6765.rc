@@ -50,6 +50,13 @@ on property:init.svc.wait_for_keymaster=stopped
     start keystore
     start gatekeeperd
 
+# Map fastboot/fastbootd to bootloader
+on property:sys.powerctl=reboot,fastboot
+    setprop sys.powerctl reboot,bootloader
+
+on property:sys.powerctl=reboot,fastbootd
+    setprop sys.powerctl reboot,bootloader
+
 # VOLD DECRYPT HANDLERS
 on property:vold.decrypt=trigger_restart_framework
     mkdir /data/misc 01771 system misc
