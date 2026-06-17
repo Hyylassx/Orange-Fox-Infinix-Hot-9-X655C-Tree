@@ -62,9 +62,9 @@ on fs
 
 on post-fs
     # Setup RPMB secure storage paths if partitions are mounted
-    exec_background /system/bin/sh -c "if [ -d /mnt/vendor/persist ]; then chown system system /mnt/vendor/persist; chmod 0771 /mnt/vendor/persist; mkdir -p /mnt/vendor/persist/rpmb; chown system system /mnt/vendor/persist/rpmb; chmod 0771 /mnt/vendor/persist/rpmb; fi"
-    exec_background /system/bin/sh -c "if [ -d /persist ]; then mkdir -p /persist/rpmb; chmod 0771 /persist/rpmb; chown system system /persist/rpmb; fi"
-    exec_background /system/bin/sh -c "if [ -d /vendor/persist ]; then mkdir -p /vendor/persist/rpmb; chmod 0771 /vendor/persist/rpmb; chown system system /vendor/persist/rpmb; fi"
+    #exec_background /system/bin/sh -c "if [ -d /mnt/vendor/persist ]; then chown system system /mnt/vendor/persist; chmod 0771 /mnt/vendor/persist; mkdir -p /mnt/vendor/persist/rpmb; chown system system /mnt/vendor/persist/rpmb; chmod 0771 /mnt/vendor/persist/rpmb; fi"
+    #exec_background /system/bin/sh -c "if [ -d /persist ]; then mkdir -p /persist/rpmb; chmod 0771 /persist/rpmb; chown system system /persist/rpmb; fi"
+    #exec_background /system/bin/sh -c "if [ -d /vendor/persist ]; then mkdir -p /vendor/persist/rpmb; chmod 0771 /vendor/persist/rpmb; chown system system /vendor/persist/rpmb; fi"
 
 # Create thh dirs ONLY after vold successfully decrypts /data
 on property:vold.decrypt=trigger_restart_framework
