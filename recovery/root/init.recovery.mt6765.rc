@@ -7,9 +7,6 @@ on early-init
 on init
     mkdir /tmp 0777 root root
     restorecon /tmp
-    mount /dev/block/mapper/system /system_root
-    mount /dev/block/mapper/vendor /vendor    
-    mount /dev/block/mapper/product /product
 
     mkdir /dev/cpuset 0750 root system
     mount cgroup none /dev/cpuset cpuset
@@ -33,6 +30,9 @@ on init
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
+    mount /dev/block/mapper/system /system_root
+    mount /dev/block/mapper/vendor /vendor    
+    mount /dev/block/mapper/product /product
     mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata
     restorecon_recursive /metadata
     
