@@ -8,8 +8,8 @@
 /product        ext4    /dev/block/mapper/product          flags=display="Product";backup=1;flashimg=1;logical
 
 # Main Storage & Cache
-/metadata       ext4    /dev/block/by-name/md_udc          flags=display="Metadata";backup=1
-/data           f2fs    /dev/block/by-name/userdata        flags=display="Data";backup=1;wipeingui;fileencryption=aes-256-xts;mounttodecrypt
+/metadata       ext4    /dev/block/platform/bootdevice/by-name/md_udc          flags=display="Metadata";backup=1
+/data           f2fs    /dev/block/platform/bootdevice/by-name/userdata        flags=display="Data";backup=1;wipeingui;fileencryption=aes-256-xts;mounttodecrypt
 /cache          ext4    /dev/block/by-name/cache           flags=display="Cache";backup=1;wipeingui
 /super          emmc    /dev/block/by-name/super           flags=display="Super Partition";backup=1;flashimg=1
 
