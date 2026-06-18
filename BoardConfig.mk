@@ -32,7 +32,7 @@ TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/twrp.flags
 
 # Kernel
-BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive bootdevice=bootdevice androidboot.hardware=mt6765 androidboot.logical_partitions=1
+BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 buildvariant=user androidboot.selinux=permissive bootdevice=bootdevice androidboot.hardware=mt6765 androidboot.logical_partitions=1
 PRODUCT_BOOT_DEVICE := 11230000.mmc
 PRODUCT_COMPRESSED_RAMDISK := gzip
 BOARD_BOOTIMG_HEADER_VERSION := 2
@@ -103,6 +103,7 @@ OF_DEFAULT_KEYMASTER_VERSION := 4.0
 OF_ENABLE_LOGGING := 1
 OF_TARGET_BOOTLOADER := bootloader
 OF_INCLUDE_RESETPROP := 1
+OF_INCLUDE_FASTBOOTD := 1
 OF_INCLUDE_LIBRESETPROP := 1
 OF_EXCLUDE_DEFAULT_USB_INIT := 1
 OF_NO_SCREEN_TIMEOUT := 1
@@ -123,10 +124,12 @@ RECOVERY_GRAPHICS_USE_LINELENGTH := true
 MINIGZIP_ARGS := -9
 
 # Twrp Specific
+TW_UNIFIED_FASTBOOTD := true
 TW_MAX_BRIGHTNESS := 1
 TW_CUSTOM_LED_PATH := "/sys/class/torch/torch"
 TW_NO_SCREEN_TIMEOUT := true
 TW_DISABLE_KEYSTORE := false
+TW_INCLUDE_FASTBOOTD := true
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
 TW_EXCLUDE_APEX := true
