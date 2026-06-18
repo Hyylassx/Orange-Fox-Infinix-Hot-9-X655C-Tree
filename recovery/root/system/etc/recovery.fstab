@@ -2,14 +2,9 @@
 #<src>                                                  <mnt_point>  <type>  <mnt_flags and options>                  <fs_mgr_flags>
 
 # Logical Partitions - MUST mount before keymaster starts
-system   /system   ext4   ro   wait,avb=vbmeta_system,logical,first_stage_mount,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey
-vendor   /vendor   ext4   ro   wait,avb,logical,first_stage_mount
-product  /product  ext4   ro   wait,avb,logical,first_stage_mount
-
-# AVB Partitions (Required for verified boot chain)
-/dev/block/platform/bootdevice/by-name/vbmeta         /vbmeta         emmc    defaults    defaults
-/dev/block/platform/bootdevice/by-name/vbmeta_system  /vbmeta_system  emmc    defaults    first_stage_mount,nofail,avb=vbmeta
-/dev/block/platform/bootdevice/by-name/vbmeta_vendor  /vbmeta_vendor  emmc    defaults    first_stage_mount,nofail
+system   /system   ext4   ro   wait,logical,first_stage_mount
+vendor   /vendor   ext4   ro   wait,logical,first_stage_mount
+product  /product  ext4   ro   wait,logical,first_stage_mount
 
 # Metadata (CRITICAL - must mount BEFORE data for FBE)
 /dev/block/platform/bootdevice/by-name/md_udc    /metadata    ext4    noatime,nosuid,nodev,discard    wait,formattable,first_stage_mount
