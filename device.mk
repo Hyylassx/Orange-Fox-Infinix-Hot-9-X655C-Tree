@@ -8,6 +8,7 @@ PRODUCT_COPY_FILES += \
 
 # --- PART 2: SYSTEM ETC ---
 PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab:recovery/root/system/etc/recovery.fstab \
     $(DEVICE_PATH)/recovery/root/system/etc/twrp.flags:recovery/root/system/etc/twrp.flags
 
 # --- PART 3: VENDOR FIRMWARE ---
