@@ -9,12 +9,6 @@ on early-init
     mkdir /mnt/vendor/protect_s 0755 root root
 
 on fs
-    # Mount metadata
-    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev
-    restorecon_recursive /metadata
-    mkdir /metadata/vold 0700 root root
-    restorecon /metadata/vold
-
     # Mount security partitions
     mount ext4 /dev/block/platform/bootdevice/by-name/persist /mnt/vendor/persist
     mount ext4 /dev/block/platform/bootdevice/by-name/nvdata /mnt/vendor/nvdata
