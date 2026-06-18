@@ -5,26 +5,18 @@ on early-init
     setprop selinux.reload_policy 0
 
 on init
-    # USB properties
     setprop sys.usb.configfs 1
     setprop sys.usb.ffs.aio_compat 1
     setprop sys.usb.controller musb-hdrc
     setprop ro.boot.usbcontroller musb-hdrc
 
-    # MTK Security Directories
-    mkdir /mnt/vendor/protect_f 0771 system system
-    mkdir /mnt/vendor/protect_s 0771 system system
-    mkdir /mnt/vendor/nvdata 0771 system system
-    mkdir /mnt/vendor/nvcfg 0771 system system
-    mkdir /mnt/vendor/persist 0771 system system
-
+    # VNDK symlinks (keep these, recovery needs them)
     symlink /system_root/system/lib64/vndk-29/libdiskconfig.so /system/lib64/libdiskconfig.so
     symlink /system_root/system/lib64/vndk-29/libpuresoftkeymasterdevice.so /system/lib64/libpuresoftkeymasterdevice.so
     symlink /system_root/system/lib64/vndk-29/libsoftkeymasterdevice.so /system/lib64/libsoftkeymasterdevice.so
     symlink /system_root/system/lib64/vndk-29/libkeymaster_messages.so /system/lib64/libkeymaster_messages.so
     symlink /system_root/system/lib64/vndk-29/libkeymaster_portable.so /system/lib64/libkeymaster_portable.so
 
-    # 2. Symlinks for keymaster (Looks in /vendor/lib64)
     mkdir /vendor/lib64 0755 root root
     symlink /system_root/system/lib64/vndk-29/libpuresoftkeymasterdevice.so /vendor/lib64/libpuresoftkeymasterdevice.so
     symlink /system_root/system/lib64/vndk-29/libsoftkeymasterdevice.so /vendor/lib64/libsoftkeymasterdevice.so
@@ -33,33 +25,6 @@ on init
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev
-    restorecon_recursive /metadata
-    mkdir /metadata/vold 0700 root root
-    restorecon /metadata/vold
-
-    chmod 0660 /dev/teei_client
-    chown system system /dev/teei_client
-    chmod 0660 /dev/teei_config
-    chown system system /dev/teei_config
-    chmod 0666 /dev/tee0
-    chown system drmrpc /dev/tee0
-    chmod 0660 /dev/tz_vfs
-    chown system system /dev/tz_vfs
-    chmod 0660 /dev/teei_fp
-    chown system system /dev/teei_fp
-    chown system drmrpc /dev/ut_keymaster
-    chmod 0660 /dev/ut_keymaster
-    chmod 0660 /dev/rpmb0
-    chown system system /dev/rpmb0
-    chmod 0660 /dev/emmcrpmb0
-    chown system system /dev/emmcrpmb0
-    chown system system /dev/utr_tui
-    chmod 0660 /dev/utr_tui
-
-    start servicemanager
-    start hwservicemanager
-    start hidl_memory
 
 on post-fs
     symlink /dev/block/sda /dev/block/mmcblk0boot0
@@ -67,26 +32,7 @@ on post-fs
     symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
 
-    chown system system /mnt/vendor/protect_f
-    chmod 0770 /mnt/vendor/protect_f
-    chown system system /mnt/vendor/protect_s
-    chmod 0770 /mnt/vendor/protect_s
-    chown system system /mnt/vendor/nvcfg
-    chmod 0771 /mnt/vendor/nvcfg
-    restorecon_recursive /mnt/vendor/nvcfg
-    chown root system /mnt/vendor/nvdata
-    chmod 0771 /mnt/vendor/nvdata
-    mkdir /mnt/vendor/nvdata/media 0771 media audio
-    restorecon_recursive /mnt/vendor/nvdata
-
-    chown system system /mnt/vendor/persist
-    chmod 0771 /mnt/vendor/persist
-    restorecon_recursive /mnt/vendor/persist
-    mkdir /mnt/vendor/persist/rpmb 0771 system system
-    restorecon_recursive /mnt/vendor/persist/rpmb
-
 on boot
-    start wait_for_vendor_tee
     chmod 0666 /dev/input/event0
     chmod 0666 /dev/input/event1
     chmod 0666 /dev/input/event2
@@ -97,131 +43,27 @@ on boot
 on post-fs-data
     start logd
 
-on property:init.svc.teei_daemon=running
-    wait_for_prop vendor.microtrust.tee.ready true
-    start beanpod_check_keybox_service
-    start keyinstall-1-0
-    start vendor.keymaster-4-0-beanpod
-    start teei_capi_2_0
-    start vendor.gatekeeper-1-0
-    start keymaster_attestation-1-1
-
-on property:init.svc.vendor.keymaster-4-0-beanpod=running
-    wait_for_prop init.svc.vendor.keymaster-4-0-beanpod running
-    wait_for_prop vendor.microtrust.tee.ready true
-    exec_background /system/bin/sh -c "sleep 2"
-    start vold
-
-on property:init.svc.vold=running
-    start keystore
-    start gatekeeperd
-    wait_for_prop init.svc.keystore running
-    wait_for_prop init.svc.gatekeeperd running
-
-on property:vold.decrypt=trigger_restart_framework
-    mkdir /data/misc 01771 system misc
-    mkdir /data/misc/keystore 0700 keystore keystore
-    mkdir /data/misc/vold 0700 root root
-    mkdir /data/misc/gatekeeper 0700 system system
-    mkdir /data/misc/systemkeys 0700 system system
-    mkdir /data/system 0775 system system
-    mkdir /data/system_ce 0770 system system
-    mkdir /data/system_de 0770 system system
-    mkdir /data/misc_ce 01771 system misc
-    mkdir /data/misc_de 01771 system misc
-    mkdir /data/vendor 0771 root root
-    mkdir /data/vendor_ce 0771 root root
-    mkdir /data/vendor_de 0771 root root
-    mkdir /data/media 0770 media_rw media_rw
-    mkdir /data/local/tmp 0771 shell shell
-    mkdir /data/data 0771 system system
-    mkdir /data/vendor/thh 0755 system system
-    mkdir /data/vendor/thh/ta 0755 system system
-    mkdir /data/vendor/thh/system 0755 system system
-    mkdir /data/vendor/key_provisioning 0771 system system
-    restorecon_recursive /data/vendor/thh
-    restorecon /data/misc
-    restorecon /data/misc/keystore
-    restorecon /data/misc/vold
-    restorecon /data/misc/gatekeeper
-    restorecon /data/misc/systemkeys
-    restorecon /data/system
-    installkey /data
-
-    trigger post-fs-data-tee
-
-on property:vold.decrypt=trigger_restart_min_framework
-    mkdir /data/misc 01771 system misc
-    mkdir /data/misc/keystore 0700 keystore keystore
-    mkdir /data/misc/vold 0700 root root
-    mkdir /data/misc/gatekeeper 0700 system system
-    mkdir /data/misc/systemkeys 0700 system system
-    mkdir /data/system 0775 system system
-    mkdir /data/system_ce 0770 system system
-    mkdir /data/system_de 0770 system system
-    mkdir /data/misc_ce 01771 system misc
-    mkdir /data/misc_de 01771 system misc
-    mkdir /data/vendor 0771 root root
-    mkdir /data/vendor_ce 0771 root root
-    mkdir /data/vendor_de 0771 root root
-    mkdir /data/media 0770 media_rw media_rw
-    mkdir /data/local/tmp 0771 shell shell
-    mkdir /data/data 0771 system system
-    mkdir /data/vendor/thh 0755 system system
-    mkdir /data/vendor/thh/ta 0755 system system
-    mkdir /data/vendor/thh/system 0755 system system
-    mkdir /data/vendor/key_provisioning 0771 system system
-    restorecon_recursive /data/vendor/thh
-    restorecon /data/misc
-    restorecon /data/misc/keystore
-    restorecon /data/misc/vold
-    restorecon /data/misc/gatekeeper
-    restorecon /data/misc/systemkeys
-    restorecon /data/system
-
-    installkey /data
-
-on property:vold.decrypt=trigger_reset_main
-    stop vold
-
-on property:vendor.crypto.fake_encrypt=1 && property:vold.post_fs_data_done=1
-    setprop vendor.soter.teei.crypto.state unencrypted
-
-on property:vold.decrypt=trigger_post_fs_data
-    setprop vold.post_fs_data_done 1
-
-on property:sys.powerctl=reboot
-    exec_background /system/bin/sh -c "echo 'REBOOT BLOCKED' >> /cache/recovery_debug.log"
-    setprop sys.powerctl ""
-
-on property:sys.powerctl=reboot,bootloader
-    exec_background /system/bin/sh -c "echo 'FASTBOOT REBOOT BLOCKED' >> /cache/recovery_debug.log"
-    setprop sys.powerctl ""
-
-on property:sys.powerctl=reboot,recovery
-    exec_background /system/bin/sh -c "echo 'RECOVERY REBOOT BLOCKED' >> /cache/recovery_debug.log"
-    setprop sys.powerctl ""
-
-service wait_for_vendor_tee /system/bin/sh -c "while [ ! -f /vendor/bin/teei_daemon ]; do sleep 1; done; start teei_daemon; class_start early_hal"
-    class main
-    user root
-    group root
-    oneshot
-    disabled
-    seclabel u:r:recovery:s0
-
+# Global services (from stock init.rc)
 service servicemanager /system/bin/servicemanager
     class core
-    user root
-    group root readproc
+    user system
+    group system readproc
     disabled
     seclabel u:r:recovery:s0
 
 service hwservicemanager /system/bin/hwservicemanager
     class core
-    user root
-    group root
+    user system
+    group system readproc
     onrestart setprop hwservicemanager.ready false
+    shutdown critical
+    disabled
+    seclabel u:r:recovery:s0
+
+service vndservicemanager /vendor/bin/vndservicemanager /dev/vndbinder
+    class core
+    user system
+    group system readproc
     shutdown critical
     disabled
     seclabel u:r:recovery:s0
@@ -244,12 +86,6 @@ service vold /system/bin/vold \
     disabled
     seclabel u:r:vold:s0
 
-service gatekeeperd /system/bin/gatekeeperd /data/misc/gatekeeper
-    class late_start
-    user system
-    disabled
-    seclabel u:r:recovery:s0
-
 service keystore /system/bin/keystore /data/misc/keystore
     class main
     user keystore
@@ -257,52 +93,11 @@ service keystore /system/bin/keystore /data/misc/keystore
     disabled
     seclabel u:r:recovery:s0
 
-service beanpod_check_keybox_service /vendor/bin/bp_kmsetkey_ca -c
-    class late_start
-    user system
-    group system
+service wait_for_keymaster /system/bin/wait_for_keymaster
+    user root
+    group root system
+    priority -20
+    ioprio rt 0
     oneshot
-    disabled
-    seclabel u:r:recovery:s0
-
-# HAL SERVICES
-service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod
-    class early_hal
-    user root
-    group root
-    disabled
-
-service keyinstall-1-0 /vendor/bin/hw/vendor.mediatek.hardware.keyinstall@1.0-service
-    class early_hal
-    user root
-    group root
-    disabled
-
-service teei_capi_2_0 /vendor/bin/hw/vendor.microtrust.hardware.capi@2.0-service
-    class early_hal
-    user root
-    group root
-    oneshot
-    disabled
-    seclabel u:r:recovery:s0
-
-service vendor.gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
-    class early_hal
-    user root
-    group root
-    disabled
-    seclabel u:r:recovery:s0
-
-service keymaster_attestation-1-1 /vendor/bin/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-service
-    class early_hal
-    user root
-    group root
-    disabled
-    seclabel u:r:recovery:s0
-
-service hidl_memory /system/bin/hw/android.hidl.allocator@1.0-service
-    class hal
-    user root
-    group root
     disabled
     seclabel u:r:recovery:s0
