@@ -19,8 +19,3 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_fw.bin:recovery/root/vendor/firmware/novatek_ts_fw.bin \
     $(DEVICE_PATH)/recovery/root/vendor/firmware/novatek_ts_mp.bin:recovery/root/vendor/firmware/novatek_ts_mp.bin
-
-# --- PART 4: SYSTEM PROPERTIES ---
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.twrp.boot=1
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.crypto.state=encrypted
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.crypto.type=file
