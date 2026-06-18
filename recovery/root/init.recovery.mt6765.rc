@@ -30,9 +30,12 @@ on init
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-    mount /dev/block/mapper/system /system_root
-    mount /dev/block/mapper/vendor /vendor    
-    mount /dev/block/mapper/product /product
+    wait /dev/block/mapper/system 15
+    wait /dev/block/mapper/vendor 15
+    wait /dev/block/mapper/product 15
+    mount ext4 /dev/block/mapper/system /system_root
+    mount ext4 /dev/block/mapper/vendor /vendor
+    mount ext4 /dev/block/mapper/product /product
     mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata
     restorecon_recursive /metadata
     
