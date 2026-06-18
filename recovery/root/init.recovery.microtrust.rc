@@ -1,3 +1,193 @@
+# Infinix Hot 9 X655C - Microtrust TEE + Beanpod Keymaster
+# Self-contained like stock microtrust.rc
+
+on early-init
+    # Mount points
+    mkdir /mnt/vendor 0755 root root
+    mkdir /mnt/vendor/persist 0755 root root
+    mkdir /mnt/vendor/nvdata 0755 root root
+    mkdir /mnt/vendor/nvcfg 0755 root root
+    mkdir /mnt/vendor/protect_f 0755 root root
+    mkdir /mnt/vendor/protect_s 0755 root root
+
+    # TEE device nodes
+    mknod /dev/teei_client c 239 0
+    mknod /dev/teei_config c 239 1
+    mknod /dev/tee0 c 239 2
+    mknod /dev/tz_vfs c 239 3
+    mknod /dev/teei_fp c 239 4
+    mknod /dev/ut_keymaster c 239 5
+    mknod /dev/rpmb0 b 253 0
+    mknod /dev/emmcrpmb0 b 253 1
+    mknod /dev/utr_tui c 239 6
+
+    chmod 0660 /dev/teei_client
+    chown system system /dev/teei_client
+    chmod 0660 /dev/teei_config
+    chown system system /dev/teei_config
+    chmod 0666 /dev/tee0
+    chown system drmrpc /dev/tee0
+    chmod 0660 /dev/tz_vfs
+    chown system system /dev/tz_vfs
+    chmod 0660 /dev/teei_fp
+    chown system system /dev/teei_fp
+    chmod 0660 /dev/ut_keymaster
+    chown system drmrpc /dev/ut_keymaster
+    chmod 0660 /dev/rpmb0
+    chown system system /dev/rpmb0
+    chmod 0660 /dev/emmcrpmb0
+    chown system system /dev/emmcrpmb0
+    chmod 0660 /dev/utr_tui
+    chown system system /dev/utr_tui
+
+on fs
+    # Mount metadata (required for FBE)
+    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev
+    restorecon_recursive /metadata
+    mkdir /metadata/vold 0700 root root
+    restorecon /metadata/vold
+
+    # Mount security partitions
+    mount ext4 /dev/block/platform/bootdevice/by-name/persist /mnt/vendor/persist
+    mount ext4 /dev/block/platform/bootdevice/by-name/nvdata /mnt/vendor/nvdata
+    mount ext4 /dev/block/platform/bootdevice/by-name/nvcfg /mnt/vendor/nvcfg
+    mount ext4 /dev/block/platform/bootdevice/by-name/protect1 /mnt/vendor/protect_f
+    mount ext4 /dev/block/platform/bootdevice/by-name/protect2 /mnt/vendor/protect_s
+
+    # Set permissions (matches stock microtrust.rc)
+    chown system system /mnt/vendor/persist
+    chmod 0771 /mnt/vendor/persist
+    restorecon_recursive /mnt/vendor/persist
+
+    mkdir /mnt/vendor/persist/rpmb
+    chown system system /mnt/vendor/persist/rpmb
+    chmod 0771 /mnt/vendor/persist/rpmb
+    restorecon_recursive /mnt/vendor/persist/rpmb
+
+    chown system system /mnt/vendor/protect_f
+    chmod 0770 /mnt/vendor/protect_f
+    chown system system /mnt/vendor/protect_s
+    chmod 0770 /mnt/vendor/protect_s
+    chown system system /mnt/vendor/nvcfg
+    chmod 0771 /mnt/vendor/nvcfg
+    restorecon_recursive /mnt/vendor/nvcfg
+    chown root system /mnt/vendor/nvdata
+    chmod 0771 /mnt/vendor/nvdata
+    mkdir /mnt/vendor/nvdata/media 0771 media audio
+    restorecon_recursive /mnt/vendor/nvdata
+
+    # Start service managers FIRST
+    start servicemanager
+    start hwservicemanager
+    start vndservicemanager
+
+    wait_for_prop hwservicemanager.ready true
+
+    # Start TEE daemon (stock timing: on fs)
+    start teei_daemon
+
+on post-fs
+    # /data/vendor/thh tree (stock microtrust.rc creates this on load_persist_props_action
+    # but we need it earlier in recovery)
+    mkdir /data 0771 system system
+    mkdir /data/vendor 0771 root root
+    mkdir /data/vendor/thh 0755 system system
+    mkdir /data/vendor/thh/system 0755 system system
+    mkdir /data/vendor/thh/tee_00 0755 system system
+    mkdir /data/vendor/thh/tee_01 0755 system system
+    mkdir /data/vendor/thh/tee_02 0755 system system
+    mkdir /data/vendor/thh/tee_03 0755 system system
+    mkdir /data/vendor/thh/tee_04 0755 system system
+    mkdir /data/vendor/thh/tee_05 0755 system system
+    mkdir /data/vendor/thh/tee_06 0755 system system
+    mkdir /data/vendor/thh/tee_07 0755 system system
+    mkdir /data/vendor/thh/tee 0755 system system
+    mkdir /data/vendor/thh/tee/tas 0755 system system
+    mkdir /data/vendor/thh/tee_08 0755 system system
+    mkdir /data/vendor/thh/tee_09 0755 system system
+    mkdir /data/vendor/thh/tee_0A 0755 system system
+    mkdir /data/vendor/thh/tee_0B 0755 system system
+    mkdir /data/vendor/thh/tee_0C 0755 system system
+    mkdir /data/vendor/thh/tee_0D 0755 system system
+    mkdir /data/vendor/thh/tee_0E 0755 system system
+    mkdir /data/vendor/thh/tee_0F 0755 system system
+    mkdir /data/vendor/thh/ta 0755 system system
+    mkdir /data/vendor/key_provisioning 0771 system system
+    restorecon_recursive /data/vendor/thh
+
+ # = = = = = = = = = = = = = = TEE -> Keymaster -> Vold Sequence  = = = = = = = = = = = = = = #
+
+on property:init.svc.teei_daemon=running
+    wait_for_prop vendor.microtrust.tee.ready true
+
+    start beanpod_check_keybox_service
+    start teei_capi_2_0
+    start vendor.keymaster-4-0-beanpod
+    start vendor.gatekeeper-1-0
+    start keymaster_attestation-1-1
+
+on property:init.svc.vendor.keymaster-4-0-beanpod=running
+    start wait_for_keymaster
+
+on property:init.svc.wait_for_keymaster=stopped
+    start vold
+
+on property:init.svc.vold=running
+    start keystore
+
+# = = = = = = = = = = = = = = Decryption Triggers (from stock vdr.rc + microtrust.rc) = = = = = = = = = = = = = = #
+
+on property:vold.decrypt=trigger_restart_framework
+    mkdir /data/misc 01771 system misc
+    mkdir /data/misc/keystore 0700 keystore keystore
+    mkdir /data/misc/vold 0700 root root
+    mkdir /data/misc/gatekeeper 0700 system system
+    mkdir /data/misc/systemkeys 0700 system system
+    mkdir /data/system 0775 system system
+    mkdir /data/system_ce 0770 system system
+    mkdir /data/system_de 0770 system system
+    mkdir /data/misc_ce 01771 system misc
+    mkdir /data/misc_de 01771 system misc
+    mkdir /data/vendor_ce 0771 root root
+    mkdir /data/vendor_de 0771 root root
+    mkdir /data/media 0770 media_rw media_rw
+    mkdir /data/local/tmp 0771 shell shell
+    mkdir /data/data 0771 system system
+
+    installkey /data
+
+    setprop vold.post_fs_data_done 1
+
+on property:vold.decrypt=trigger_restart_min_framework
+    mkdir /data/misc 01771 system misc
+    mkdir /data/misc/keystore 0700 keystore keystore
+    mkdir /data/misc/vold 0700 root root
+    mkdir /data/misc/gatekeeper 0700 system system
+    mkdir /data/misc/systemkeys 0700 system system
+    mkdir /data/system 0775 system system
+    mkdir /data/system_ce 0770 system system
+    mkdir /data/system_de 0770 system system
+    mkdir /data/misc_ce 01771 system misc
+    mkdir /data/misc_de 01771 system misc
+    mkdir /data/vendor_ce 0771 root root
+    mkdir /data/vendor_de 0771 root root
+    mkdir /data/media 0770 media_rw media_rw
+    mkdir /data/local/tmp 0771 shell shell
+    mkdir /data/data 0771 system system
+
+    installkey /data
+
+on property:vold.decrypt=trigger_reset_main
+    stop vold
+
+on property:vendor.crypto.fake_encrypt=1 && property:vold.post_fs_data_done=1
+    setprop vendor.soter.teei.crypto.state unencrypted
+
+on property:vold.decrypt=trigger_post_fs_data
+    setprop vold.post_fs_data_done 1
+
+# = = = = = = = = = = = = = = SERVICES = = = = = = = = = = = = = = #
+
 service teei_daemon /vendor/bin/teei_daemon \
     -r 020b0000000000000000000000000000 \
     -r 020f0000000000000000000000000000 \
@@ -21,3 +211,41 @@ service teei_daemon /vendor/bin/teei_daemon \
     user system
     group system
     disabled
+    seclabel u:r:recovery:s0
+
+service beanpod_check_keybox_service /vendor/bin/bp_kmsetkey_ca -c
+    class late_start
+    user system
+    group system
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
+service teei_capi_2_0 /vendor/bin/hw/vendor.microtrust.hardware.capi@2.0-service
+    class hal
+    user system
+    group system
+    oneshot
+    disabled
+    seclabel u:r:recovery:s0
+
+service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod
+    class early_hal
+    user system
+    group system drmrpc
+    disabled
+    seclabel u:r:recovery:s0
+
+service vendor.gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
+    class hal
+    user system
+    group system
+    disabled
+    seclabel u:r:recovery:s0
+
+service keymaster_attestation-1-1 /vendor/bin/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-service
+    class hal
+    user system
+    group system
+    disabled
+    seclabel u:r:recovery:s0
