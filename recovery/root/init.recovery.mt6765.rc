@@ -12,14 +12,12 @@ on init
     setprop sys.usb.controller musb-hdrc
     setprop ro.boot.usbcontroller musb-hdrc
     setprop sys.init_fatal_vold.reboot 0
-    export LD_LIBRARY_PATH /system_root/system/lib64/vndk-29:/system_root/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system_root/system/lib/vndk-29:/system_root/system/lib/vndk-sp-29:/system/lib:/vendor/lib:/sbin
-
+    
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata
+    # Mount metadata
+    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev
     restorecon_recursive /metadata
-    
-    # Ensure vold metadata dir exists
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
 
@@ -39,9 +37,8 @@ on boot
 
 on post-fs-data
     start logd
-
-    mount ext4 /dev/block/mapper/system /system_root
-    mount ext4 /dev/block/mapper/vendor /vendor
+    mount /dev/block/mapper/system /system_root
+    mount /dev/block/mapper/vendor /vendor
 
 # = = = = = = GLOBAL SERVICES = = = = = = #
 
