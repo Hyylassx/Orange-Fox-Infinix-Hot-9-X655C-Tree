@@ -59,14 +59,14 @@ on post-fs-data
 
 # = = = = = = GLOBAL SERVICES = = = = = = #
 
-service servicemanager /system/bin/servicemanager
+service servicemanager /system_root/system/system/bin/servicemanager
     class core
     user system
     group system readproc
     disabled
     seclabel u:r:recovery:s0
 
-service hwservicemanager /system/bin/hwservicemanager
+service hwservicemanager /system_root/system/system/bin/hwservicemanager
     class core
     user system
     group system readproc
@@ -83,7 +83,7 @@ service vndservicemanager /vendor/bin/vndservicemanager /dev/vndbinder
     disabled
     seclabel u:r:recovery:s0
 
-service logd /system/bin/logd
+service logd /system_root/system/system/bin/logd
     class core
     user logd
     group logd system package_info readproc
@@ -101,14 +101,14 @@ service vold /system/bin/vold \
     disabled
     seclabel u:r:vold:s0
 
-service keystore /system/bin/keystore /data/misc/keystore
+service keystore /system_root/system/system/bin/keystore /data/misc/keystore
     class main
     user keystore
     group keystore drmrpc readproc log
     disabled
     seclabel u:r:recovery:s0
 
-service wait_for_keymaster /system/bin/wait_for_keymaster
+service wait_for_keymaster /system_root/system/bin/wait_for_keymaster
     user root
     group root system
     priority -20
