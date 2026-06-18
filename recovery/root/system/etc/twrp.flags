@@ -2,15 +2,17 @@
 /boot           emmc    /dev/block/by-name/boot            flags=display="Boot";backup=1;flashimg=1
 /recovery       emmc    /dev/block/by-name/recovery        flags=display="Recovery";backup=1;flashimg=1
 
-# Dynamic Partitions (Logical)
+# Dynamic Partitions (Logical) - REMOVE mounttodecrypt from here, fstab handles it
 /system_root    ext4    /dev/block/mapper/system           flags=display="System";backup=1;flashimg=1;logical
 /vendor         ext4    /dev/block/mapper/vendor           flags=display="Vendor";backup=1;flashimg=1;logical
 /product        ext4    /dev/block/mapper/product          flags=display="Product";backup=1;flashimg=1;logical
 
-# Main Storage & Cache
-/metadata       ext4    /dev/block/platform/bootdevice/by-name/md_udc          flags=display="Metadata";backup=1
-/data           f2fs    /dev/block/platform/bootdevice/by-name/userdata        flags=display="Data";backup=1;wipeingui;fileencryption=aes-256-xts;mounttodecrypt
+# Main Storage - mounttodecrypt ONLY here, NOT in fstab
+/metadata       ext4    /dev/block/by-name/md_udc          flags=display="Metadata";backup=1;mounttodecrypt
+/data           f2fs    /dev/block/by-name/userdata        flags=display="Data";backup=1;wipeingui;mounttodecrypt
 /cache          ext4    /dev/block/by-name/cache           flags=display="Cache";backup=1;wipeingui
+
+# Super partition
 /super          emmc    /dev/block/by-name/super           flags=display="Super Partition";backup=1;flashimg=1
 
 # MTK Security & NVRAM Blocks
@@ -27,10 +29,10 @@
 /logo           emmc    /dev/block/by-name/logo            flags=display="Logo";backup=1;flashimg=1
 /dtbo           emmc    /dev/block/by-name/dtbo            flags=display="DTBO";backup=1;flashimg=1
 /vbmeta         emmc    /dev/block/by-name/vbmeta          flags=display="VBMeta";backup=1;flashimg=1
+/vbmeta_system  emmc    /dev/block/by-name/vbmeta_system   flags=display="VBMeta System";backup=1;flashimg=1
+/vbmeta_vendor  emmc    /dev/block/by-name/vbmeta_vendor   flags=display="VBMeta Vendor";backup=1;flashimg=1
 /bootloader     emmc    /dev/block/by-name/lk              flags=display="LK";backup=1;flashimg=1
 /bootloader2    emmc    /dev/block/by-name/lk2             flags=display="LK2";backup=1;flashimg=1
-/preloader_a    emmc    /dev/block/by-name/preloader_a     flags=display="Preloader A"
-/preloader_b    emmc    /dev/block/by-name/preloader_b     flags=display="Preloader B"
 /tee1           emmc    /dev/block/by-name/tee1            flags=display="TEE1";backup=1
 /tee2           emmc    /dev/block/by-name/tee2            flags=display="TEE2";backup=1
 /scp1           emmc    /dev/block/by-name/scp1            flags=display="SCP1";backup=1
