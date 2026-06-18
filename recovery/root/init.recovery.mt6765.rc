@@ -33,7 +33,7 @@ on init
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata noatime,nosuid,nodev,discard
+    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata
     restorecon_recursive /metadata
     
     # Ensure vold metadata dir exists
