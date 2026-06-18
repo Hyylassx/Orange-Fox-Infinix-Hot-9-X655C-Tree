@@ -153,6 +153,3 @@ TARGET_RECOVERY_DEVICE_MODULES += \
     libfscrypt \
     gatekeeperd \
     wait_for_keymaster
-
-# CRITICAL FIX: Remove wrong key path, let OrangeFox auto-detect
-# TW_FORCE_KEY_DIRECTORY := "/data/unencrypted/key"  # REMOVED - wrong for MTK FBE
