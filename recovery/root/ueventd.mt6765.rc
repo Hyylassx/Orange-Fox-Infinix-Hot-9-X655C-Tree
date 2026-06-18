@@ -20,6 +20,17 @@
 /dev/block/platform/bootdevice/by-name/metadata  0660    system    system
 /dev/block/platform/bootdevice/by-name/userdata  0660    system    system
 
+# TEEI
+/dev/teei_client              0660   system     system
+/dev/teei_config              0660   system     system
+/dev/tee0                     0666   system     drmrpc
+/dev/tz_vfs                   0660   system     system
+/dev/teei_fp                  0660   system     system
+/dev/ut_keymaster             0660   system     drmrpc
+/dev/rpmb0                    0660   system     system
+/dev/emmcrpmb0                0660   system     system
+/dev/utr_tui                  0660   system     system
+
 #ITD: Add DSP RK1608 By Jesse 190925 Start
 /dev/rk_preisp                  0666   system   camera
 #ITD: Add DSP RK1608 By Jesse 190925 End
