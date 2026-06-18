@@ -28,8 +28,6 @@ on post-fs
     symlink /dev/block/sdb /dev/block/mmcblk0boot1
     symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
     symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
-    mount ext4 /dev/block/mapper/system /system_root
-    mount ext4 /dev/block/mapper/vendor /vendor
 
 on boot
     chmod 0666 /dev/input/event0
@@ -41,6 +39,9 @@ on boot
 
 on post-fs-data
     start logd
+
+    mount ext4 /dev/block/mapper/system /system_root
+    mount ext4 /dev/block/mapper/vendor /vendor
 
 # = = = = = = GLOBAL SERVICES = = = = = = #
 
