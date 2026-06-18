@@ -37,8 +37,8 @@ on boot
 
 on post-fs-data
     start logd
-    mount /dev/block/mapper/system /system_root
-    mount /dev/block/mapper/vendor /vendor
+    mount ext4 /dev/block/mapper/system /system_root
+    mount ext4 /dev/block/mapper/vendor /vendor
 
 # = = = = = = GLOBAL SERVICES = = = = = = #
 
