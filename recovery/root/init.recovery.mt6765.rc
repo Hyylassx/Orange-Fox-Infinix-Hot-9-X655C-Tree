@@ -5,23 +5,28 @@ on early-init
     setprop selinux.reload_policy 0
 
 on init
+    mkdir /tmp 0777 root root
+    restorecon /tmp
+
+    mkdir /dev/cpuset 0750 root system
+    mount cgroup none /dev/cpuset cpuset
+    mkdir /dev/cpuset/foreground 0750 root system
+    mkdir /dev/cpuset/background 0750 root system
+    mkdir /dev/cpuset/system-background 0750 root system
+    mkdir /dev/cpuset/top-app 0750 root system
+    write /dev/cpuset/foreground/tasks 1
+    write /dev/cpuset/background/tasks 1
+    write /dev/cpuset/system-background/tasks 1
+
+    mkdir /dev/cg2_bpf 0750 root system
+    mount cgroup2 none /dev/cg2_bpf nodev noexec nosuid
+
     setprop sys.usb.configfs 1
     setprop sys.usb.ffs.aio_compat 1
     setprop sys.usb.controller musb-hdrc
     setprop ro.boot.usbcontroller musb-hdrc
-
-    # VNDK symlinks (keep these, recovery needs them)
-    symlink /system_root/system/lib64/vndk-29/libdiskconfig.so /system/lib64/libdiskconfig.so
-    symlink /system_root/system/lib64/vndk-29/libpuresoftkeymasterdevice.so /system/lib64/libpuresoftkeymasterdevice.so
-    symlink /system_root/system/lib64/vndk-29/libsoftkeymasterdevice.so /system/lib64/libsoftkeymasterdevice.so
-    symlink /system_root/system/lib64/vndk-29/libkeymaster_messages.so /system/lib64/libkeymaster_messages.so
-    symlink /system_root/system/lib64/vndk-29/libkeymaster_portable.so /system/lib64/libkeymaster_portable.so
-
-    mkdir /vendor/lib64 0755 root root
-    symlink /system_root/system/lib64/vndk-29/libpuresoftkeymasterdevice.so /vendor/lib64/libpuresoftkeymasterdevice.so
-    symlink /system_root/system/lib64/vndk-29/libsoftkeymasterdevice.so /vendor/lib64/libsoftkeymasterdevice.so
-    symlink /system_root/system/lib64/vndk-29/libkeymaster_messages.so /vendor/lib64/libkeymaster_messages.so
-    symlink /system_root/system/lib64/vndk-29/libkeymaster_portable.so /vendor/lib64/libkeymaster_portable.so
+    setprop sys.init_fatal_vold.reboot 0
+    export LD_LIBRARY_PATH /system_root/system/lib64/vndk-29:/system/lib64:/vendor/lib64:/system/lib:/vendor/lib:/sbin
 
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
@@ -43,7 +48,8 @@ on boot
 on post-fs-data
     start logd
 
-# Global services (from stock init.rc)
+# = = = = = = GLOBAL SERVICES = = = = = = #
+
 service servicemanager /system/bin/servicemanager
     class core
     user system
