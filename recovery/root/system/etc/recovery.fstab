@@ -2,13 +2,13 @@
 #<src>                                                  <mnt_point>  <type>  <mnt_flags and options>                  <fs_mgr_flags>
 
 # Logical Partitions
-system   /system   ext4   ro   wait,avb=vbmeta_system,logical,first_stage_mount
-vendor   /vendor   ext4   ro   wait,avb,logical,first_stage_mount
-product  /product  ext4   ro   wait,avb,logical,first_stage_mount
+system   /system   ext4   ro   wait,logical,first_stage_mount
+vendor   /vendor   ext4   ro   wait,logical,first_stage_mount
+product  /product  ext4   ro   wait,logical,first_stage_mount
 
 # Data and Metadata (CRITICAL for FBE Decryption)
-/dev/block/platform/bootdevice/by-name/md_udc    /metadata    ext4    noatime,nosuid,nodev,discard    wait,formattable,first_stage_mount
-/dev/block/platform/bootdevice/by-name/userdata  /data        f2fs    noatime,nosuid,nodev,discard    latemount,wait,check,quota,fileencryption=aes-256-xts,formattable
+/dev/block/platform/bootdevice/by-name/md_udc    /metadata    ext4    noatime,nosuid,nodev,discard    wait,formattable
+/dev/block/platform/bootdevice/by-name/userdata  /data        f2fs    noatime,nosuid,nodev,discard    wait,check,quota,fileencryption=aes-256-xts,formattable
 
 # Cache & Transsion Specific
 /dev/block/platform/bootdevice/by-name/cache     /cache       ext4    noatime,nosuid,nodev,noauto_da_alloc,discard    wait,check,formattable
