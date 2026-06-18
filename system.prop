@@ -49,14 +49,6 @@ ro.control_privapp_permissions=disable
 dev.default_navbar_layout=0
 ro.orangefox.status_bar_high=100
 ro.orangefox.corner_radius=40
-
-# Fastbootd - DISABLED for MTK (use bootloader -> fastboot reboot fastboot)
-ro.fastbootd.available=false
 sys.usb.controller=musb-hdrc
 vendor.usb.controller=musb-hdrc
 sys.usb.configfs=1
-
-# MediaTek USB Identifiers
-ro.recovery.usb.vid=0E8D
-ro.recovery.usb.pid=201C
-sys.usb.fastbootd.pid=201C
