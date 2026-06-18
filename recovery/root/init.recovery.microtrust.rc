@@ -167,6 +167,7 @@ service teei_daemon /vendor/bin/teei_daemon \
     seclabel u:r:recovery:s0
 
 service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod
+    export LD_LIBRARY_PATH /system_root/system/lib64/vndk-29:/system_root/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system_root/system/lib/vndk-29:/system_root/system/lib/vndk-sp-29:/system/lib:/vendor/lib:/sbin
     class early_hal
     user system
     group system drmrpc
@@ -174,6 +175,7 @@ service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4
     seclabel u:r:recovery:s0
 
 service vendor.gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service
+    export LD_LIBRARY_PATH /system_root/system/lib64/vndk-29:/system_root/system/lib64/vndk-sp-29:/system/lib64:/vendor/lib64:/system_root/system/lib/vndk-29:/system_root/system/lib/vndk-sp-29:/system/lib:/vendor/lib:/sbin
     class hal
     user system
     group system
