@@ -16,7 +16,8 @@ PRODUCT_PLATFORM := mt6765
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
 PRODUCT_PACKAGES += \
-    vold \
-    gatekeeperd \
+    vold_recovery \
+    keystore_recovery \
+    gatekeeperd_recovery \
     wait_for_keymaster \
     fastbootd
