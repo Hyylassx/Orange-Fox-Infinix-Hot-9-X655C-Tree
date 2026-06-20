@@ -25,7 +25,9 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_aidl.so:root/system/lib/libkeystore_aidl.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_binder.so:root/system/lib/libkeystore_binder.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_parcelables.so:root/system/lib/libkeystore_parcelables.so
+    $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_parcelables.so:root/system/lib/libkeystore_parcelables.so \
+    $(DEVICE_PATH)/recovery/root/system/lib/libhidlmemory.so:root/system/lib/libhidlmemory.so
+
 
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.keymaster@3.0.so:root/system/lib/android.hardware.keymaster@3.0.so \
@@ -41,6 +43,7 @@ PRODUCT_COPY_FILES += \
 
 # --- PART 6: SYSTEM LIBRARIES 64-BIT ---
 PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libhidlmemory.so:root/system/lib64/libhidlmemory.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libfscrypt.so:root/system/lib64/libfscrypt.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_aidl.so:root/system/lib64/libkeystore_aidl.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_binder.so:root/system/lib64/libkeystore_binder.so \
