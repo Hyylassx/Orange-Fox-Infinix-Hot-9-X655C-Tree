@@ -147,12 +147,10 @@ TW_CUSTOM_SETTINGS_PATH := /cache/recovery/fox
 
 TARGET_RECOVERY_DEVICE_MODULES += \
     keystore \
-    keystore2 \
     vold \
     gatekeeperd \
     wait_for_keymaster \
     fastbootd \
     servicemanager \
     hwservicemanager \
-    vndservicemanager \
-    libvold
+    vndservicemanager
