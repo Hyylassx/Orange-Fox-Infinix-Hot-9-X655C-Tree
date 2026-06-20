@@ -146,9 +146,9 @@ TW_LOAD_VENDOR_BOOT_MODULES := true
 TW_CUSTOM_SETTINGS_PATH := /cache/recovery/fox
 
 TARGET_RECOVERY_DEVICE_MODULES += \
-    keystore \
-    vold \
-    gatekeeperd \
+    keystore_recovery \
+    vold_recovery \
+    gatekeeperd_recovery \
     wait_for_keymaster \
     fastbootd \
     servicemanager \
