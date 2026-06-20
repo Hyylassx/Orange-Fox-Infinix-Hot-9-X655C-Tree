@@ -6,9 +6,6 @@ on early-init
     setprop selinux.reload_policy 0
 
 on init
-    # Save logcat to /cache so we don't lose vold/teei logs on reboot
-    exec_background /system/bin/sh -c "logcat -f /cache/recovery_logcat.log -v threadtime &"
-
     mkdir /tmp 0777 root root
     restorecon /tmp
 
