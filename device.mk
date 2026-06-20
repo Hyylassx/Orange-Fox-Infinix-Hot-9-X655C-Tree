@@ -61,8 +61,10 @@ PRODUCT_COPY_FILES += \
 
 # --- PART 7: VENDOR BINARIES ---
 PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/vendor/bin/vndservice:recovery/root/vendor/bin/vndservice \
     $(DEVICE_PATH)/recovery/root/vendor/bin/teei_daemon:recovery/root/vendor/bin/teei_daemon \
     $(DEVICE_PATH)/recovery/root/vendor/bin/bp_kmsetkey_ca:recovery/root/vendor/bin/bp_kmsetkey_ca \
+    $(DEVICE_PATH)/recovery/root/vendor/bin/vndservicemanager:recovery/root/vendor/bin/vndservicemanager \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/android.hardware.gatekeeper@1.0-service:recovery/root/vendor/bin/hw/android.hardware.gatekeeper@1.0-service \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/vendor.microtrust.hardware.capi@2.0-service:recovery/root/vendor/bin/hw/vendor.microtrust.hardware.capi@2.0-service \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod:recovery/root/vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod \
@@ -98,6 +100,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libion_ulit.so:recovery/root/vendor/lib64/libion_ulit.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libimsg_log.so:recovery/root/vendor/lib64/libimsg_log.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libTEECommon.so:recovery/root/vendor/lib64/libTEECommon.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/libifcutils_mtk.so:recovery/root/vendor/lib64/libifcutils_mtk.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libcrypto-mdapp.so:recovery/root/vendor/lib64/libcrypto-mdapp.so
 
 PRODUCT_COPY_FILES += \
