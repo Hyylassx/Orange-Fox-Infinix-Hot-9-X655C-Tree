@@ -31,6 +31,7 @@ PRODUCT_COPY_FILES += \
 
 
 PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/system/lib/android.hidl.memory@1.0.so:root/system/lib/android.hidl.memory@1.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.keymaster@3.0.so:root/system/lib/android.hardware.keymaster@3.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.keymaster@4.0.so:root/system/lib/android.hardware.keymaster@4.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.gatekeeper@1.0.so:root/system/lib/android.hardware.gatekeeper@1.0.so
@@ -53,6 +54,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib64/libwifikeystorehal.so:root/system/lib64/libwifikeystorehal.so
 
 PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/system/lib64/android.hidl.memory@1.0.so:root/system/lib64/android.hidl.memory@1.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.keymaster@3.0.so:root/system/lib64/android.hardware.keymaster@3.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.keymaster@4.0.so:root/system/lib64/android.hardware.keymaster@4.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.gatekeeper@1.0.so:root/system/lib64/android.hardware.gatekeeper@1.0.so
