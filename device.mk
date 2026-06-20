@@ -23,29 +23,24 @@ PRODUCT_COPY_FILES += \
 
 # --- PART 5: SYSTEM LIBRARIES 32-BIT ---
 PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/system/lib/libion.so:root/system/lib/libion.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/libhwbinder.so:root/system/lib/libhwbinder.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/libhidlmemory.so:root/system/lib/libhidlmemory.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/libgatekeeper.so:root/system/lib/libgatekeeper.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_aidl.so:root/system/lib/libkeystore_aidl.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_binder.so:root/system/lib/libkeystore_binder.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_parcelables.so:root/system/lib/libkeystore_parcelables.so
 
 PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/system/lib/android.hidl.memory@1.0.so:root/system/lib/android.hidl.memory@1.0.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.boot@1.0.so:root/system/lib/android.hardware.boot@1.0.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/android.hidl.allocator@1.0.so:root/system/lib/android.hidl.allocator@1.0.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/android.hidl.memory.token@1.0.so:root/system/lib/android.hidl.memory.token@1.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.keymaster@3.0.so:root/system/lib/android.hardware.keymaster@3.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.keymaster@4.0.so:root/system/lib/android.hardware.keymaster@4.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.gatekeeper@1.0.so:root/system/lib/android.hardware.gatekeeper@1.0.so
 
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/system/lib/libkeymaster4support.so:recovery/root/system/lib/libkeymaster4support.so \
+    $(DEVICE_PATH)/recovery/root/system/lib/libkeymaster_messages.so:root/system/lib/libkeymaster_messages.so \
+    $(DEVICE_PATH)/recovery/root/system/lib/libkeymaster_portable.so:root/system/lib/libkeymaster_portable.so \
+    $(DEVICE_PATH)/recovery/root/system/lib/libsoftkeymasterdevice.so:root/system/lib/libsoftkeymasterdevice.so \
+    $(DEVICE_PATH)/recovery/root/system/lib/libpuresoftkeymasterdevice.so:recovery/root/system/lib/libpuresoftkeymasterdevice.so
+
 # --- PART 6: SYSTEM LIBRARIES 64-BIT ---
 PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/system/lib64/libion.so:root/system/lib64/libion.so \
-    $(DEVICE_PATH)/recovery/root/system/lib64/libhwbinder.so:root/system/lib64/libhwbinder.so \
-    $(DEVICE_PATH)/recovery/root/system/lib64/libhidlmemory.so:root/system/lib64/libhidlmemory.so \
-    $(DEVICE_PATH)/recovery/root/system/lib64/libgatekeeper.so:root/system/lib64/libgatekeeper.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libfscrypt.so:root/system/lib64/libfscrypt.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_aidl.so:root/system/lib64/libkeystore_aidl.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_binder.so:root/system/lib64/libkeystore_binder.so \
@@ -53,20 +48,21 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib64/libwifikeystorehal.so:root/system/lib64/libwifikeystorehal.so
 
 PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/system/lib64/android.hidl.memory@1.0.so:root/system/lib64/android.hidl.memory@1.0.so \
-    $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.boot@1.0.so:root/system/lib64/android.hardware.boot@1.0.so \
-    $(DEVICE_PATH)/recovery/root/system/lib64/android.hidl.allocator@1.0.so:root/system/lib64/android.hidl.allocator@1.0.so \
-    $(DEVICE_PATH)/recovery/root/system/lib64/android.hidl.memory.token@1.0.so:root/system/lib64/android.hidl.memory.token@1.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.keymaster@3.0.so:root/system/lib64/android.hardware.keymaster@3.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.keymaster@4.0.so:root/system/lib64/android.hardware.keymaster@4.0.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/android.hardware.gatekeeper@1.0.so:root/system/lib64/android.hardware.gatekeeper@1.0.so
+
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libkeymaster4support.so:recovery/root/system/lib64/libkeymaster4support.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libkeymaster_messages.so:root/system/lib64/libkeymaster_messages.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libkeymaster_portable.so:root/system/lib64/libkeymaster_portable.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libsoftkeymasterdevice.so:root/system/lib64/libsoftkeymasterdevice.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libpuresoftkeymasterdevice.so:recovery/root/system/lib64/libpuresoftkeymasterdevice.so
 
 # --- PART 7: VENDOR BINARIES ---
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/bin/teei_daemon:recovery/root/vendor/bin/teei_daemon \
     $(DEVICE_PATH)/recovery/root/vendor/bin/bp_kmsetkey_ca:recovery/root/vendor/bin/bp_kmsetkey_ca \
-    $(DEVICE_PATH)/recovery/root/vendor/bin/vndservice:recovery/root/vendor/bin/vndservice \
-    $(DEVICE_PATH)/recovery/root/vendor/bin/vndservicemanager:recovery/root/vendor/bin/vndservicemanager \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/android.hardware.gatekeeper@1.0-service:recovery/root/vendor/bin/hw/android.hardware.gatekeeper@1.0-service \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/vendor.microtrust.hardware.capi@2.0-service:recovery/root/vendor/bin/hw/vendor.microtrust.hardware.capi@2.0-service \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod:recovery/root/vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod \
@@ -84,6 +80,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/gatekeeper.mt6765.so:recovery/root/vendor/lib/hw/gatekeeper.mt6765.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/libSoftGatekeeper.so:recovery/root/vendor/lib/hw/libSoftGatekeeper.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib/hw/gatekeeper.default.so:recovery/root/vendor/lib/hw/gatekeeper.default.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/vendor.microtrust.hardware.capi@2.0.so:recovery/root/vendor/lib/vendor.microtrust.hardware.capi@2.0.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/android.hardware.gatekeeper@1.0-impl.so:recovery/root/vendor/lib/hw/android.hardware.gatekeeper@1.0-impl.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/vendor.mediatek.hardware.keymaster_attestation@1.0.so:recovery/root/vendor/lib/vendor.mediatek.hardware.keymaster_attestation@1.0.so \
@@ -91,13 +88,8 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so:recovery/root/vendor/lib/hw/vendor.mediatek.hardware.keymaster_attestation@1.1-impl.so
 
 PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libkeymaster4support.so:recovery/root/vendor/lib/libkeymaster4support.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libkeymaster_messages_bp.so:root/vendor/lib/libkeymaster_messages_bp.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libkeymaster_portable_bp.so:root/vendor/lib/libkeymaster_portable_bp.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libsoftkeymasterdevice_bp.so:root/vendor/lib/libsoftkeymasterdevice_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/kmsetkey.mt6765.so:recovery/root/vendor/lib/hw/kmsetkey.mt6765.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/hw/kmsetkey.default.so:recovery/root/vendor/lib/hw/kmsetkey.default.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib/libpuresoftkeymasterdevice_bp.so:recovery/root/vendor/lib/libpuresoftkeymasterdevice_bp.so
+    $(DEVICE_PATH)/recovery/root/vendor/lib/hw/kmsetkey.default.so:recovery/root/vendor/lib/hw/kmsetkey.default.so
 
 # --- PART 9: VENDOR LIBRARIES 64-BIT ---
 PRODUCT_COPY_FILES += \
@@ -111,6 +103,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/libSoftGatekeeper.so:recovery/root/vendor/lib64/hw/libSoftGatekeeper.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/gatekeeper.mt6765.so:recovery/root/vendor/lib64/hw/gatekeeper.mt6765.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/gatekeeper.default.so:recovery/root/vendor/lib64/hw/gatekeeper.default.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/vendor.microtrust.hardware.capi@2.0.so:recovery/root/vendor/lib64/vendor.microtrust.hardware.capi@2.0.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/android.hardware.gatekeeper@1.0-impl.so:recovery/root/vendor/lib64/hw/android.hardware.gatekeeper@1.0-impl.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.0.so:recovery/root/vendor/lib64/vendor.mediatek.hardware.keymaster_attestation@1.0.so \
@@ -120,13 +113,9 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkmsetkey.so:recovery/root/vendor/lib64/libkmsetkey.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster4.so:recovery/root/vendor/lib64/libkeymaster4.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster_messages_bp.so:root/vendor/lib64/libkeymaster_messages_bp.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster_portable_bp.so:root/vendor/lib64/libkeymaster_portable_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeymaster4support.so:recovery/root/vendor/lib64/libkeymaster4support.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib64/libpuresoftkeymasterdevice_bp.so:recovery/root/vendor/lib64/libpuresoftkeymasterdevice_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeystore-wifi-hidl.so:recovery/root/vendor/lib64/libkeystore-wifi-hidl.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libkeystore-engine-wifi-hidl.so:recovery/root/vendor/lib64/libkeystore-engine-wifi-hidl.so \
-    $(DEVICE_PATH)/recovery/root/vendor/lib64/libsoftkeymasterdevice_bp.so:root/vendor/lib64/libsoftkeymasterdevice_bp.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/kmsetkey.mt6765.so:recovery/root/vendor/lib64/hw/kmsetkey.mt6765.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/kmsetkey.default.so:recovery/root/vendor/lib64/hw/kmsetkey.default.so
 
@@ -138,8 +127,3 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/thh/ta/c09c9c5daa504b78b0e46eda61556c3a.ta:recovery/root/vendor/thh/ta/c09c9c5daa504b78b0e46eda61556c3a.ta \
     $(DEVICE_PATH)/recovery/root/vendor/thh/ta/c1882f2d885e4e13a8c8e2622461b2fa.ta:recovery/root/vendor/thh/ta/c1882f2d885e4e13a8c8e2622461b2fa.ta \
     $(DEVICE_PATH)/recovery/root/vendor/thh/ta/d91f322ad5a441d5955110eda3272fc0.ta:recovery/root/vendor/thh/ta/d91f322ad5a441d5955110eda3272fc0.ta
-
-# --- PART 11: SYSTEM PROPERTIES ---
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.twrp.boot=1
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.crypto.state=encrypted
-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.crypto.type=file
