@@ -26,7 +26,8 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_aidl.so:root/system/lib/libkeystore_aidl.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_binder.so:root/system/lib/libkeystore_binder.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeystore_parcelables.so:root/system/lib/libkeystore_parcelables.so \
-    $(DEVICE_PATH)/recovery/root/system/lib/libhidlmemory.so:root/system/lib/libhidlmemory.so
+    $(DEVICE_PATH)/recovery/root/system/lib/libhidlmemory.so:root/system/lib/libhidlmemory.so \
+    $(DEVICE_PATH)/recovery/root/system/lib/libsysutils.so:root/system/lib/libsysutils.so
 
 
 PRODUCT_COPY_FILES += \
@@ -35,16 +36,17 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib/android.hardware.gatekeeper@1.0.so:root/system/lib/android.hardware.gatekeeper@1.0.so
 
 PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/system/lib/libkeymaster4support.so:recovery/root/system/lib/libkeymaster4support.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeymaster_messages.so:root/system/lib/libkeymaster_messages.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libkeymaster_portable.so:root/system/lib/libkeymaster_portable.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libsoftkeymasterdevice.so:root/system/lib/libsoftkeymasterdevice.so \
+    $(DEVICE_PATH)/recovery/root/system/lib/libkeymaster4support.so:recovery/root/system/lib/libkeymaster4support.so \
     $(DEVICE_PATH)/recovery/root/system/lib/libpuresoftkeymasterdevice.so:recovery/root/system/lib/libpuresoftkeymasterdevice.so
 
 # --- PART 6: SYSTEM LIBRARIES 64-BIT ---
 PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/system/lib64/libhidlmemory.so:root/system/lib64/libhidlmemory.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libfscrypt.so:root/system/lib64/libfscrypt.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libsysutils.so:root/system/lib64/libsysutils.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libhidlmemory.so:root/system/lib64/libhidlmemory.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_aidl.so:root/system/lib64/libkeystore_aidl.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_binder.so:root/system/lib64/libkeystore_binder.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_parcelables.so:root/system/lib64/libkeystore_parcelables.so \
