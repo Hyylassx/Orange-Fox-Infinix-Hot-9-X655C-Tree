@@ -147,9 +147,11 @@ TW_CUSTOM_SETTINGS_PATH := /cache/recovery/fox
 TARGET_RECOVERY_DEVICE_MODULES += \
     keystore \
     keystore2 \
+    vold \
+    gatekeeperd \
+    wait_for_keymaster \
+    fastbootd \
     servicemanager \
     hwservicemanager \
-    vndservicemanager
-
-# CRITICAL FIX: Remove wrong key path, let OrangeFox auto-detect
-# TW_FORCE_KEY_DIRECTORY := "/data/unencrypted/key"  # REMOVED - wrong for MTK FBE
+    vndservicemanager \
+    libvold
