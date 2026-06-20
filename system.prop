@@ -12,25 +12,25 @@ sys.usb.ffs.aio_compat=true
 
 # Platform & Hardware Graphics
 ro.board.platform=mt6765
-ro.hardware=mt6765
 ro.vendor.mediatek.platform=MT6765
 ro.hardware.egl=mali
 ro.treble.enabled=true
 ro.boot.dynamic_partitions=true
 
-# Microtrust Beanpod TEE Security Props (Fix Decryption)
+# Microtrust Beanpod TEE Security Props
 ro.odm.tee=1
 ro.vendor.mtk_microtrust_tee_support=1
-ro.hardware.gatekeeper=beanpod
+ro.hardware.gatekeeper=default
+ro.hardware.keystore=beanpod
 ro.hardware.keystore_deserialize=true
 
-# Verified Boot State (Crucial for Keymaster 4.0)
+# Verified Boot State
 ro.boot.verifiedbootstate=orange
 ro.boot.flash.locked=0
 ro.boot.vbmeta.device_state=unlocked
 ro.boot.veritymode=disabled
 
-# File-Based Encryption (FBE) Configurations
+# File-Based Encryption (FBE)
 ro.crypto.volume.contents_mode=aes-256-xts
 ro.crypto.volume.filenames_mode=aes-256-cts
 ro.crypto.fbe_crypto_fields_supported=true
@@ -38,25 +38,16 @@ ro.crypto.set_unencrypted_property=true
 ro.crypto.state=encrypted
 ro.crypto.type=file
 ro.crypto.fbe_sdcard_internal=true
-# REMOVED: ro.crypto.metadata_init_enabled=true (Not for Android 10, breaks vold)
+ro.crypto.fbe.enabled=true
+ro.crypto.metadata_init_enabled=true
 
-# OrangeFox Advanced GUI & Display Target
+# OrangeFox Display
 ro.sf.lcd_density=320
 ro.orangefox.disable_conv_layout=1
 ro.control_privapp_permissions=disable
-
-# OrangeFox Screen Layout Fixes (Infinix Hot 9 Play Notch/Corner Adaptation)
 dev.default_navbar_layout=0
 ro.orangefox.status_bar_high=100
 ro.orangefox.corner_radius=40
-
-# Fastbootd Configuration & Windows Device Manager Link Fixes
-ro.fastbootd.available=true
 sys.usb.controller=musb-hdrc
 vendor.usb.controller=musb-hdrc
 sys.usb.configfs=1
-
-# MediaTek MT6765 Fallback Fastboot Identifiers
-ro.recovery.usb.vid=0E8D
-ro.recovery.usb.pid=201C
-sys.usb.fastbootd.pid=201C
