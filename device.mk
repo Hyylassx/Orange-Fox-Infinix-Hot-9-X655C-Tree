@@ -48,8 +48,11 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/lib64/libfscrypt.so:root/system/lib64/libfscrypt.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libsysutils.so:root/system/lib64/libsysutils.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libhidlmemory.so:root/system/lib64/libhidlmemory.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libgatekeeper.so:root/system/lib64/libgatekeeper.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libservices.so:root/system/lib64/libservices.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_aidl.so:root/system/lib64/libkeystore_aidl.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_binder.so:root/system/lib64/libkeystore_binder.so \
+    $(DEVICE_PATH)/recovery/root/system/lib64/libprotobuf-cpp-lite.so:root/system/lib64/libprotobuf-cpp-lite.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libkeystore_parcelables.so:root/system/lib64/libkeystore_parcelables.so \
     $(DEVICE_PATH)/recovery/root/system/lib64/libwifikeystorehal.so:root/system/lib64/libwifikeystorehal.so
 
