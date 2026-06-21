@@ -1,5 +1,10 @@
 import /init.recovery.microtrust.rc
 
+on early-init
+    # REMOVED: write /sys/fs/selinux/enforce 0 
+    # (Android 12 init loads policy AFTER early-init, resetting it to enforcing. 
+    # Moved to post-fs below, and relies on androidboot.selinux=permissive in BoardConfig.mk)
+
 on init
     mkdir /tmp 0777 root root
     restorecon /tmp
@@ -43,9 +48,10 @@ on fs
     start hidl_memory
 
 on post-fs
-    write /sys/fs/selinux/enforce 0
+    # Force SELinux to permissive AFTER the policy is loaded (Fallback for kernel cmdline)
     chmod 0666 /sys/fs/selinux/enforce
-    setprop selinux.reload_policy 0
+    write /sys/fs/selinux/enforce 0
+
     symlink /dev/block/sda /dev/block/mmcblk0boot0
     symlink /dev/block/sdb /dev/block/mmcblk0boot1
     symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
@@ -63,6 +69,14 @@ on post-fs
     start teei_daemon
 
 on boot
+    # Ensure USB and ADB are explicitly configured and started
+    setprop sys.usb.configfs 1
+    setprop sys.usb.ffs.aio_compat 1
+    setprop sys.usb.controller musb-hdrc
+    setprop ro.boot.usbcontroller musb-hdrc
+    setprop sys.usb.config adb
+    start adbd
+
     chmod 0666 /dev/input/event0
     chmod 0666 /dev/input/event1
     chmod 0666 /dev/input/event2
@@ -76,9 +90,25 @@ on boot
     mount ext4 /dev/block/mapper/vendor /vendor
 
 on post-fs-data
-    # /data/misc is NOT created here anymore. 
-    # It will be created AFTER vold decrypts /data to prevent set_policy_failed panic.
+    # CHANGED: Moved from vold.decrypt triggers. Android 12 init doesn't use vold.decrypt.
+    # Data is now ready for directory creation.
     start logd
+
+    mkdir /data/misc 01771 system misc
+    mkdir /data/misc/keystore 0700 keystore keystore
+    mkdir /data/misc/vold 0700 root root
+    mkdir /data/misc/gatekeeper 0700 system system
+    mkdir /data/misc/systemkeys 0700 system system
+    mkdir /data/system 0775 system system
+    mkdir /data/system_ce 0770 system system
+    mkdir /data/misc_ce 01771 system misc
+    mkdir /data/vendor 0771 root root
+    mkdir /data/vendor_ce 0771 root root
+    mkdir /data/media 0770 media_rw media_rw
+    mkdir /data/local/tmp 0771 shell shell
+    mkdir /data/data 0771 system system
+    
+    trigger post-fs-data-tee
 
 # ============================================
 # TEE / KEYMASTER / VOLD TRIGGER CHAIN
@@ -92,7 +122,6 @@ on property:init.svc.teei_daemon=running
     start keymaster_attestation-1-1
 
 on property:init.svc.vendor.keymaster-4-0-beanpod=running
-    # REMOVED: setprop vold.post_fs_data_done 1 (This breaks vold crypto state machine!)
     start vold
 
 on property:init.svc.vold=running
@@ -102,41 +131,7 @@ on property:init.svc.wait_for_keymaster=stopped
     start keystore
     start gatekeeperd
 
-# VOLD DECRYPT STATE HANDLERS
-on property:vold.decrypt=trigger_restart_framework
-    # Data is now decrypted, safe to create /data dirs
-    mkdir /data/misc 01771 system misc
-    mkdir /data/misc/keystore 0700 keystore keystore
-    mkdir /data/misc/vold 0700 root root
-    mkdir /data/misc/gatekeeper 0700 system system
-    mkdir /data/misc/systemkeys 0700 system system
-    mkdir /data/system 0775 system system
-    mkdir /data/system_ce 0770 system system
-    mkdir /data/misc_ce 01771 system misc
-    mkdir /data/vendor 0771 root root
-    mkdir /data/vendor_ce 0771 root root
-    mkdir /data/media 0770 media_rw media_rw
-    mkdir /data/local/tmp 0771 shell shell
-    mkdir /data/data 0771 system system
-    trigger post-fs-data-tee
-
-on property:vold.decrypt=trigger_restart_min_framework
-    # Data is now decrypted, safe to create /data dirs
-    mkdir /data/misc 01771 system misc
-    mkdir /data/misc/keystore 0700 keystore keystore
-    mkdir /data/misc/vold 0700 root root
-    mkdir /data/misc/gatekeeper 0700 system system
-    mkdir /data/misc/systemkeys 0700 system system
-    mkdir /data/system 0775 system system
-    mkdir /data/system_ce 0770 system system
-    mkdir /data/misc_ce 01771 system misc
-    mkdir /data/vendor 0771 root root
-    mkdir /data/vendor_ce 0771 root root
-    mkdir /data/media 0770 media_rw media_rw
-    mkdir /data/local/tmp 0771 shell shell
-    mkdir /data/data 0771 system system
-    trigger post-fs-data-tee
-
+# VOLD DECRYPT STATE HANDLERS (Kept for legacy fallback if needed)
 on property:vold.decrypt=trigger_reset_main
     exec_background /system/bin/sh -c "dmesg >> /cache/vold_fail_dmesg.log; getprop >> /cache/vold_fail_props.log"
     stop vold
@@ -213,24 +208,11 @@ on post-fs-data-tee
     chown system system /data/vendor/key_provisioning
     restorecon_recursive /data/vendor/thh
 
-# ============================================
-# PREVENT BOOTLOOP & FASTBOOT REBOOTS
-# ============================================
-on property:sys.powerctl=reboot
-    exec_background /system/bin/sh -c "echo 'REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
-    setprop sys.powerctl ""
-
-on property:sys.powerctl=reboot,bootloader
-    exec_background /system/bin/sh -c "echo 'FASTBOOT REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
-    setprop sys.powerctl ""
-
-on property:sys.powerctl=reboot,recovery
-    exec_background /system/bin/sh -c "echo 'RECOVERY REBOOT BLOCKED' >> /cache/recovery_debug.log; dmesg >> /cache/recovery_dmesg_blocked.log; getprop >> /cache/recovery_props_blocked.log"
-    setprop sys.powerctl ""
+# REMOVED: sys.powerctl=reboot blocks. 
+# The Android 12 recovery binary calls the reboot() syscall directly when the GUI fails to initialize.
+# Init property triggers cannot intercept direct C-level kernel syscalls.
 
 # CORE SERVICES
-# NOTE: Removed 'critical' keyword so crashes don't cascade into a fastboot reboot!
-
 service servicemanager /system/bin/servicemanager
     class core
     user root
@@ -294,7 +276,6 @@ service wait_for_keymaster /system/bin/wait_for_keymaster
     seclabel u:r:recovery:s0
 
 # HAL SERVICES
-
 service vendor.keymaster-4-0-beanpod /vendor/bin/hw/android.hardware.keymaster@4.0-service.beanpod
     class early_hal
     user system
