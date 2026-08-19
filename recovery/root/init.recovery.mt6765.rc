@@ -165,7 +165,7 @@ service gatekeeperd /system/bin/gatekeeperd /data/misc/gatekeeper
     disabled
     seclabel u:r:recovery:s0
 
-# 🔑 SERVICES: Android 10 & 11 Traditional Keystore (FIXED GROUP GID)
+# Android 10 & 11 Traditional Keystore (FIXED GROUP GID)
 service keystore /system/bin/keystore /data/misc/keystore
     class main
     user keystore
@@ -174,7 +174,7 @@ service keystore /system/bin/keystore /data/misc/keystore
     disabled
     seclabel u:r:recovery:s0
 
-# 🔑 MODEREN SERVICE: Keystore2 Rust Android 12 and above
+# Keystore2 Rust Android 12 and above
 service keystore2 /system/bin/keystore2 /data/misc/keystore
     class main
     user 1000
