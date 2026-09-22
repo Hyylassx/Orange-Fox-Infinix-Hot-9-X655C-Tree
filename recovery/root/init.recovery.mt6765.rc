@@ -15,11 +15,13 @@ on init
     
 on fs
     write /sys/class/udc/musb-hdrc/device/cmode 1
-    # Mount metadata
-    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev
+    mount ext4 /dev/block/platform/bootdevice/by-name/md_udc /metadata nosuid,nodev wait
     restorecon_recursive /metadata
     mkdir /metadata/vold 0700 root root
     restorecon /metadata/vold
+    
+    # Start the vendor binder manager early
+    start vndservicemanager
 
 on post-fs
     symlink /dev/block/sda /dev/block/mmcblk0boot0
@@ -35,67 +37,9 @@ on boot
     chmod 0666 /dev/input/event4
     chmod 0666 /dev/input/event5
 
-on post-fs-data
-    start logd
-    mount ext4 /dev/block/mapper/system /system_root
-    mount ext4 /dev/block/mapper/vendor /vendor
-
-# = = = = = = GLOBAL SERVICES = = = = = = #
-
-service servicemanager /system/bin/servicemanager
-    class core
-    user system
-    group system readproc
-    disabled
-    seclabel u:r:recovery:s0
-
-service hwservicemanager /system/bin/hwservicemanager
-    class core
-    user system
-    group system readproc
-    onrestart setprop hwservicemanager.ready false
-    shutdown critical
-    disabled
-    seclabel u:r:recovery:s0
-
 service vndservicemanager /vendor/bin/vndservicemanager /dev/vndbinder
     class core
     user system
     group system readproc
     shutdown critical
-    disabled
-    seclabel u:r:recovery:s0
-
-service logd /system/bin/logd
-    class core
-    user logd
-    group logd system package_info readproc
-    capabilities SYSLOG AUDIT_CONTROL
-    priority 10
-    seclabel u:r:logd:s0
-
-service vold /system/bin/vold \
-        --blkid_context=u:r:blkid:s0 --blkid_untrusted_context=u:r:blkid_untrusted:s0 \
-        --fsck_context=u:r:fsck:s0 --fsck_untrusted_context=u:r:fsck_untrusted:s0
-    class core
-    ioprio be 2
-    shutdown critical
-    group root reserved_disk
-    disabled
-    seclabel u:r:vold:s0
-
-service keystore /system/bin/keystore /data/misc/keystore
-    class main
-    user keystore
-    group keystore drmrpc readproc log
-    disabled
-    seclabel u:r:recovery:s0
-
-service wait_for_keymaster /system/bin/wait_for_keymaster
-    user root
-    group root system
-    priority -20
-    ioprio rt 0
-    oneshot
-    disabled
     seclabel u:r:recovery:s0
