@@ -1,4 +1,6 @@
-# OrangeFox BoardConfig
+# OrangeFox BoardConfig for Infinix Hot 9 (X655C)
+# Configured for Native Decryption Across Android 10 to Android 14 GSIs
+
 DEVICE_PATH := device/infinix/X655C
 ALLOW_MISSING_DEPENDENCIES := true
 
@@ -24,14 +26,14 @@ TARGET_BOOTLOADER_BOARD_NAME := CY-X655C-H6211-
 TARGET_USES_64_BIT_BINDER := true
 TARGET_SUPPORTS_64_BIT_APPS := true
 
-# Filesystem
+# Filesystem & Tree Paths
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 TARGET_SCREEN_DENSITY := 320
 TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab
 
-# Kernel
+# Kernel Parameters (Pulled from stock Android 10 specifications)
 BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 buildvariant=user androidboot.selinux=permissive bootdevice=bootdevice androidboot.hardware=mt6765 androidboot.logical_partitions=1
 PRODUCT_BOOT_DEVICE := 11230000.mmc
 PRODUCT_COMPRESSED_RAMDISK := gzip
@@ -47,15 +49,13 @@ BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 BOARD_PREBUILT_DTBIMAGE := $(DEVICE_PATH)/prebuilt/dtb.img
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/Image.gz
 TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img
-TARGET_COPY_OUT_VENDOR := vendor
-TARGET_COPY_OUT_PRODUCT := product
 
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)
 
-# Partitions
+# Partition Boundaries
 BOARD_FLASH_BLOCK_SIZE := 131072
 BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 40894464
@@ -69,14 +69,14 @@ BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 119291231232
 BOARD_RAMDISK_USE_LZMA := false
 
-# Dynamic Partitions
+# Dynamic Partitions Mapping
 BOARD_SUPER_PARTITION_SIZE := 4479516672
 BOARD_SUPER_PARTITION_GROUPS := infinix_dynamic_partitions
 BOARD_INFINIX_DYNAMIC_PARTITIONS_SIZE := 4475322368
 BOARD_INFINIX_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor product
 BOARD_USES_DYNAMIC_PARTITIONS := true
 
-# MTK
+# MediaTek Platform Hardware Directives
 BOARD_USES_MTK_HARDWARE := true
 BOARD_HAS_MTK_HARDWARE := true
 BOARD_ROOT_EXTRA_FOLDERS := cache persist nvdata nvcfg protect_f protect_s tranfs external_sd usb_otg system_root
@@ -88,13 +88,13 @@ BUILD_BROKEN_VNDK_VERSION := true
 BUILD_BROKEN_DUP_RULES := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 
-# Security
+# Security Patch Alignment
 VENDOR_SECURITY_PATCH := 2026-06-01
 PLATFORM_SECURITY_PATCH := 2026-06-01
 PLATFORM_VERSION := 10
 PLATFORM_VERSION_LAST_RELEASE := 14
 
-# OrangeFox Specific
+# OrangeFox Advanced Recovery Parameters
 OF_USE_TWRP := 1
 OF_NO_TWRP_COMPAT := 0
 OF_ENABLE_LPTOOLS := 1
@@ -123,33 +123,35 @@ RECOVERY_SDCARD_ON_DATA := 1
 RECOVERY_GRAPHICS_USE_LINELENGTH := true
 MINIGZIP_ARGS := -9
 
-# Twrp Specific
-TW_UNIFIED_FASTBOOTD := true
-TW_MAX_BRIGHTNESS := 1
+# Universal Crypto Decryption Directives (Android 10 - 14 Interoperability)
+TW_MAX_BRIGHTNESS := 225
 TW_CUSTOM_LED_PATH := "/sys/class/torch/torch"
 TW_NO_SCREEN_TIMEOUT := true
 TW_DISABLE_KEYSTORE := false
-TW_INCLUDE_FASTBOOTD := true
-TW_INCLUDE_LOGICAL := true
+TW_CRYPTO_SYSTEM_VOLD := true
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
+TW_INCLUDE_FBE_METADATA_DECRYPT := true
+
+# CRITICAL FORCE SWITCH FOR FBE v2 KEY WRAPPING MECHANISMS USED BY NEWER GSIs
+TW_USE_FSCRYPT_POLICY := 2
+TW_NO_KEYSTORE2 := true
+
+# Fastbootd & Layout Target Rules
+TW_UNIFIED_FASTBOOTD := true
+TW_INCLUDE_FASTBOOTD := true
+TW_INCLUDE_LOGICAL := true
 TW_EXCLUDE_APEX := true
 TW_EXCLUDE_TWRPAPP := true
 TW_DEFAULT_LANGUAGE := en
 TW_EXTRA_LANGUAGES := false
 TW_THEME := portrait_hdpi
-TW_USE_FSCRYPT_POLICY := 1
-TW_LOAD_VENDOR_BOOT_MODULES := true
 TW_CUSTOM_SETTINGS_PATH := /cache/recovery/fox
 
+# Core Service Linkers (Bypasses open-source duplicates to favor your tree's prebuilts)
 TARGET_RECOVERY_DEVICE_MODULES += \
-    vold \
-    libvold \
-    keystore \
     servicemanager \
     hwservicemanager \
     vndservicemanager \
-    libion \
-    libfscrypt \
-    gatekeeperd \
-    wait_for_keymaster
+    wait_for_keymaster \
+    libion
